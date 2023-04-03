@@ -76,7 +76,7 @@ services:
       - auth_data:/data/db
     networks:
       - auth-net
-      #- main-net
+      - main-net
 
   competitiondb:
     container_name: competitiondb
@@ -91,7 +91,7 @@ services:
       - competition_data:/data/db
     networks:
       - competition-net
-      #- main-net
+      - main-net
 
 volumes:
   auth_data:

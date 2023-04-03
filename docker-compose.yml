@@ -46,7 +46,6 @@ services:
   authdb:
     container_name: authdb
     image: mongo:latest
-    restart: always
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=root1234
@@ -81,7 +80,6 @@ services:
   competitiondb:
     container_name: competitiondb
     image: mongo:latest
-    restart: always
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=root1234

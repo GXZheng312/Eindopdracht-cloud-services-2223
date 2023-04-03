@@ -16,6 +16,7 @@
     "nodemon": "^2.0.22"
   },
   "dependencies": {
+    "amqplib": "^0.10.3",
     "mongoose": "^7.0.3"
   },
   "jest": {

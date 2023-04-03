@@ -1,0 +1,108 @@
+version: '1'
+name: photo-prestiges
+services:
+  messagebroker:
+    container_name: messagebroker
+    image: rabbitmq:latest
+    networks:
+      - photo-prestiges-net
+      
+  backend:
+    container_name: backend
+    build: 
+      context: ./backend
+      dockerfile: dockerfile
+    command: npm run dev
+    ports: 
+      - 3000:3000
+    environment:
+      - PORT=3000
+      - MESSAGE_QUEUE=amqp://messagebroker
+    volumes:
+      - "./backend:/usr/src/app/"
+    networks:
+      - photo-prestiges-net
+
+  auth:
+    container_name: auth-service
+    build: 
+      context: ./auth
+      dockerfile: dockerfile
+    command: npm run dev
+    ports: 
+      - 3020:3020
+    environment:
+      - PORT=3020
+      - MONGO_URL=mongodb://admin:root1234@authdb:27017
+      - MESSAGE_QUEUE=amqp://messagebroker
+    depends_on:
+      - authdb
+    volumes:
+      - "./auth:/usr/src/app/"
+    networks:
+      - photo-prestiges-net
+      - auth-net
+
+  authdb:
+    container_name: authdb
+    image: mongo:latest
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=root1234
+      - MONGO_INITDB_DATABASE=authdb
+    expose:
+      - 27017
+    volumes:
+       - auth_data:/data/db
+    networks:
+      - auth-net
+
+  competition:
+    container_name: competition-service
+    build: 
+      context: ./competition
+      dockerfile: dockerfile
+    command: npm run dev
+    ports: 
+      - 3010:3010
+    environment:
+      - PORT=3010
+      - MONGO_URL=mongodb://admin:root1234@competitiondb:27017
+      - MESSAGE_QUEUE=amqp://messagebroker
+    depends_on:
+      - competitiondb
+    volumes:
+      - "./competition:/usr/src/app/"
+    networks:
+      - photo-prestiges-net
+      - competition-net
+
+  competitiondb:
+    container_name: competitiondb
+    image: mongo:latest
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=root1234
+      - MONGO_INITDB_DATABASE=competitiondb
+    expose:
+      - 27017
+    volumes:
+       - competition_data:/data/db
+    networks:
+      - competition-net
+
+volumes:
+  auth_data:
+  competition_data:
+
+networks:
+  photo-prestiges-net:
+    driver: bridge
+  auth-net:
+    driver: bridge
+    internal: true
+  competition-net:
+    driver: bridge
+    internal: true

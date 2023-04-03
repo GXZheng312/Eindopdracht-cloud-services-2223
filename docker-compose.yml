@@ -6,7 +6,7 @@ services:
     image: rabbitmq:latest
     networks:
       - photo-prestiges-net
-      
+
   backend:
     container_name: backend
     build: 
@@ -51,8 +51,8 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=root1234
       - MONGO_INITDB_DATABASE=authdb
-    expose:
-      - 27017
+    ports:
+      - 27100:27017
     volumes:
        - auth_data:/data/db
     networks:
@@ -86,8 +86,8 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=root1234
       - MONGO_INITDB_DATABASE=competitiondb
-    expose:
-      - 27017
+    ports:
+      - 27200:27017
     volumes:
        - competition_data:/data/db
     networks:

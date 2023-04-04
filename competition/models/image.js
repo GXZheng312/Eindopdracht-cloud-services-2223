@@ -14,8 +14,7 @@ const imageSchema = new mongoose.Schema({
   },
   uploadby: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+    ref: 'User',
   },
 });
 

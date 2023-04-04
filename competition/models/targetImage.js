@@ -10,7 +10,7 @@ const targetImageSchema = new mongoose.Schema({
   },
   image: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Image",
+    ref: 'Image',
     required: true,
   },
   thumbsup: {

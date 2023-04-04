@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 module.exports = () => {
   if (mongoose.connection.readyState === 0) {
-    const uri = process.env.MONGODB_URI;
+    const uri = process.env.MONGO_URL + '/competitiondb';
     /* const options = {
       db: { native_parser: true },
       server: { poolSize: 5 },
@@ -13,6 +13,7 @@ module.exports = () => {
     mongoose.connect(uri).catch((err) => {
       console.log(err);
     });
+    console.log(uri);
   }
 
   mongoose.connection.on('open', () => {

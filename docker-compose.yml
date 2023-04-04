@@ -33,7 +33,7 @@ services:
       - 3020:3020
     environment:
       - PORT=3020
-      - MONGO_URL=mongodb://admin:root1234@authdb:27017
+      - MONGO_URL=mongodb://authdb:27017
       - MESSAGE_QUEUE=amqp://messagebroker
     depends_on:
       - authdb
@@ -53,7 +53,7 @@ services:
       - 3010:3010
     environment:
       - PORT=3010
-      - MONGO_URL=mongodb://admin:root1234@competitiondb:27017
+      - MONGO_URL=mongodb://competitiondb:27017
       - MESSAGE_QUEUE=amqp://messagebroker
     depends_on:
       - competitiondb
@@ -67,9 +67,6 @@ services:
     container_name: authdb
     image: mongo:latest
     restart: always
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=root1234
     ports:
       - 27100:27017
     volumes:
@@ -82,9 +79,6 @@ services:
     container_name: competitiondb
     restart: always
     image: mongo:latest
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=root1234
     ports:
       - 27200:27017
     volumes:

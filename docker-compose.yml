@@ -4,64 +4,87 @@ services:
   messagebroker:
     container_name: messagebroker
     image: rabbitmq:latest
-    networks:
-      - main-net
 
-  backend:
-    container_name: backend
+  api-client:
+    container_name: api-client
     build: 
-      context: ./backend
+      context: ./api-client
       dockerfile: dockerfile
     command: npm run dev
     ports: 
       - 3000:3000
     environment:
       - PORT=3000
-      - MESSAGE_QUEUE=amqp://messagebroker
     volumes:
-      - "./backend:/usr/src/app/"
-    networks:
-      - main-net
+      - "./api-client:/usr/src/app/"
 
   auth:
     container_name: auth-service
     build: 
-      context: ./auth
-      dockerfile: dockerfile
-    command: npm run dev
-    ports: 
-      - 3020:3020
-    environment:
-      - PORT=3020
-      - MONGO_URL=mongodb://authdb:27017
-      - MESSAGE_QUEUE=amqp://messagebroker
-    depends_on:
-      - authdb
-    volumes:
-      - "./auth:/usr/src/app/"
-    networks:
-      - main-net
-      - auth-net
-
-  competition:
-    container_name: competition-service
-    build: 
-      context: ./competition
+      context: ./services/auth
       dockerfile: dockerfile
     command: npm run dev
     ports: 
       - 3010:3010
     environment:
       - PORT=3010
+      - MONGO_URL=mongodb://authdb:27017
+      - MESSAGE_QUEUE=amqp://messagebroker
+    depends_on:
+      - authdb
+    volumes:
+      - "./services/auth:/usr/src/app/"
+
+  competition:
+    container_name: competition-service
+    build: 
+      context: ./services/competition
+      dockerfile: dockerfile
+    command: npm run dev
+    ports: 
+      - 3020:3020
+    environment:
+      - PORT=3020
       - MONGO_URL=mongodb://competitiondb:27017
       - MESSAGE_QUEUE=amqp://messagebroker
     depends_on:
       - competitiondb
     volumes:
-      - "./competition:/usr/src/app/"
-    networks:
-      - main-net
-      - competition-net
+      - "./services/competition:/usr/src/app/"
+
+  image:
+    container_name: image-service
+    build: 
+      context: ./services/image
+      dockerfile: dockerfile
+    command: npm run dev
+    ports: 
+      - 3030:3030
+    environment:
+      - PORT=3030
+      - MONGO_URL=mongodb://imagedb:27017
+      - MESSAGE_QUEUE=amqp://messagebroker
+    depends_on:
+      - imagedb
+    volumes:
+      - "./services/image:/usr/src/app/"
+
+  user:
+    container_name: user-service
+    build: 
+      context: ./services/user
+      dockerfile: dockerfile
+    command: npm run dev
+    ports: 
+      - 3040:3040
+    environment:
+      - PORT=3040
+      - MONGO_URL=mongodb://userdb:27017
+      - MESSAGE_QUEUE=amqp://messagebroker
+    depends_on:
+      - userdb
+    volumes:
+      - "./services/user:/usr/src/app/"
 
   authdb:
     container_name: authdb
@@ -71,9 +94,6 @@ services:
       - 27100:27017
     volumes:
       - auth_data:/data/db
-    networks:
-      - auth-net
-      - main-net
 
   competitiondb:
     container_name: competitiondb
@@ -83,18 +103,27 @@ services:
       - 27200:27017
     volumes:
       - competition_data:/data/db
-    networks:
-      - competition-net
-      - main-net
+
+  imagedb:
+    container_name: imagedb
+    restart: always
+    image: mongo:latest
+    ports:
+      - 27300:27017
+    volumes:
+      - image_data:/data/db
+
+  userdb:
+    container_name: userdb
+    restart: always
+    image: mongo:latest
+    ports:
+      - 27400:27017
+    volumes:
+      - user_data:/data/db
 
 volumes:
   auth_data:
   competition_data:
-
-networks:
-  main-net:
-    driver: bridge
-  auth-net:
-    driver: bridge 
-  competition-net:
-    driver: bridge
+  image_data:
+  user_data:

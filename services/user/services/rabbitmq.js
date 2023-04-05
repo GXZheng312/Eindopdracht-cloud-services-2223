@@ -21,6 +21,7 @@ const publishToExchange = async (exchangeName, routingKey, data) => {
 const subscribeToTopic = async (exchangeName, routingKey, callback) => {
   const { channel } = await connect();
 
+  await channel.assertExchange(exchangeName,'topic', { durable: false })
   const { queue } = await channel.assertQueue('', { exclusive: true });
   await channel.bindQueue(queue, exchangeName, routingKey);
 

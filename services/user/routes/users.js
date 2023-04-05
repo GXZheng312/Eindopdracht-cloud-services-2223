@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const userRepository = require('../repository/user');
-const roleRepository = require('../repository/role');
-const { consumeFromQueue } = require('../services/rabbitmq');
+const userRepository = require('../repositories/user');
+const roleRepository = require('../repositories/role');
 
 router.get('/:username', async function(req, res, next) {
   const username = req.params.username;
@@ -73,6 +72,5 @@ router.delete('/:username', async function(req, res, next) {
     next(error);
   }
 });
-
 
 module.exports = router;

@@ -1,4 +1,3 @@
-// shared/rabbitmq.js
 const amqp = require('amqplib');
 
 const connect = async () => {

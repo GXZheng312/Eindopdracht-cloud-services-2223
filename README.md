@@ -8,15 +8,18 @@ To start the project, navigate to the project directory in your terminal and run
 
 ### Container Details
 
-| Container Name | Internal Port | External Port | Network                | Dependencies        |
-|----------------|---------------|---------------|-----------------------|---------------------|
-| messagebroker  |               |               | photo-prestiges-net    |                     |
-| backend        | 3000          | 3000          | photo-prestiges-net    | messagebroker       |
-| auth-service   | 3020          | 3020          | auth-net, photo-prestiges-net | messagebroker, authdb |
-| authdb         | 27100         | 27017         | auth-net               |                     |
-| competition    | 3010          | 3010          | competition-net, photo-prestiges-net | messagebroker, competitiondb |
-| competitiondb  | 27200         | 27017         | competition-net        |                     |
-
+| Container Name | Internal Port | External Port | Dependencies        |
+|----------------|---------------|---------------|---------------|
+| messagebroker  |               |               |                    |
+| backend        | 3000          | 3000          |        |
+| auth-service   | 3020          | 3020          | authdb |
+| authdb         | 27100         | 27017         |                      |
+| competition-service    | 3010          | 3010          | competitiondb |
+| competitiondb  | 27200         | 27017                |                     |
+| image-service    | 3030          | 3030          | competitiondb |
+| imagendb  | 27300         | 27017                |                     |
+| user-service    | 3040          | 3040          | competitiondb |
+| userdb  | 27400         | 27017                |                     |
 
 ## Useful commands
 Here are some useful commands for working with the containers in this project:

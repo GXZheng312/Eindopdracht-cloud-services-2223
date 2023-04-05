@@ -19,6 +19,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// config setup
+require('dotenv').config();
+require('./services/database')();
+
+// Database setup
+require('./models/user');
+require('./models/role');
+require('./seeds/');
+
+//routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 

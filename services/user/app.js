@@ -14,6 +14,6 @@ require('./seeds/');
 
 //routes
 app.use('/', require('./routes/index'));
-app.use('/users', require('./routes/users'));
+app.use('/user', require('./routes/users'));
 
 module.exports = app;

@@ -1,7 +1,7 @@
 const amqp = require('amqplib');
 
 const connect = async () => {
-  const connection = await amqp.connect('amqp://localhost');
+  const connection = await amqp.connect(process.env.RABBITMQ_URL);
   const channel = await connection.createChannel();
 
   return { connection, channel };
@@ -10,12 +10,12 @@ const connect = async () => {
 const publishToExchange = async (exchangeName, routingKey, data) => {
   const { channel, connection } = await connect();
 
-  await channel.assertExchange(exchangeName, 'topic', { durable: true });
-  await channel.publish(exchangeName, routingKey, Buffer.from(JSON.stringify(data)), { persistent: true });
+  await channel.assertExchange(exchangeName, 'topic', { durable: false });
+  await channel.publish(exchangeName, routingKey, Buffer.from(JSON.stringify(data)));
 
   setTimeout(() => {
     connection.close();
-  }, 500);
+  }, 10000);
 };
 
 const subscribeToTopic = async (exchangeName, routingKey, callback) => {

@@ -29,7 +29,7 @@ services:
     environment:
       - PORT=3010
       - MONGO_URL=mongodb://authdb:27017
-      - MESSAGE_QUEUE=amqp://messagebroker
+      - RABBITMQ_URL=amqp://messagebroker
     depends_on:
       - authdb
     volumes:
@@ -46,7 +46,7 @@ services:
     environment:
       - PORT=3020
       - MONGO_URL=mongodb://competitiondb:27017
-      - MESSAGE_QUEUE=amqp://messagebroker
+      - RABBITMQ=amqp://messagebroker
     depends_on:
       - competitiondb
     volumes:
@@ -63,7 +63,7 @@ services:
     environment:
       - PORT=3030
       - MONGO_URL=mongodb://imagedb:27017
-      - MESSAGE_QUEUE=amqp://messagebroker
+      - RABBITMQ_URL=amqp://messagebroker
     depends_on:
       - imagedb
     volumes:
@@ -80,7 +80,7 @@ services:
     environment:
       - PORT=3040
       - MONGO_URL=mongodb://userdb:27017
-      - MESSAGE_QUEUE=amqp://messagebroker
+      - RABBITMQ_URL=amqp://messagebroker
     depends_on:
       - userdb
     volumes:

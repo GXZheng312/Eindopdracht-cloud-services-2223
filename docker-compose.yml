@@ -5,10 +5,10 @@ services:
     container_name: messagebroker
     image: rabbitmq:latest
 
-  api-client:
-    container_name: api-client
+  api-gateway:
+    container_name: api-gateway
     build: 
-      context: ./api-client
+      context: ./api-gateway
       dockerfile: dockerfile
     command: npm run dev
     ports: 
@@ -16,7 +16,7 @@ services:
     environment:
       - PORT=3000
     volumes:
-      - "./api-client:/usr/src/app/"
+      - "./api-gateway:/usr/src/app/"
 
   auth:
     container_name: auth-service

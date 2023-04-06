@@ -1,16 +1,18 @@
-const myPublish = async () => {
-    const exchangeName = 'user';
-    const routingKey = 'user.auth.key';
-    const message = { hello: 'world' };
+const { publishToExchange, subscribeToTopic } = require("../services/rabbitmq");
 
-    try {
-        await publishToExchange(exchangeName, routingKey, message);
-        console.log('Message published successfully');
-    } catch (error) {
-        console.error('Failed to publish message:', error);
-    }
+const publishUserDataRequest = async (username) => {
+    const exchangeName = 'user';
+    const routingKey = `user.data.request.${username}`;
+
+    await publishToExchange(exchangeName, routingKey, username);
+    return new Promise((resolve) => {
+        subscribeToTopic('user', `user.data.response.${username}`, (data) => {
+            console.log(data);
+            resolve(data);
+        });
+    });
 }
 
 module.exports = { 
-    myPublish
+    publishUserDataRequest
 }

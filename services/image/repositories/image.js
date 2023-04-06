@@ -15,7 +15,7 @@ async function getImageByUrl(url) {
 }
 
 async function updateImage(url, updates) {
-  const image = await Image.findOneAndUpdate({ url }, updates, { new: true });
+  const image = await Image.findOneAndUpdate({ url }, {$set: updates}, { new: true });
   return image;
 }
 

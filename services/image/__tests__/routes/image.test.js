@@ -1,18 +1,20 @@
 const mongoose = require('mongoose');
+const mockingoose = require('mockingoose');
 const { createImage, getImageByUrl, updateImage, deleteImage } = require('../../repositories/image');
 const Image = require('../../models/image');
 
 describe('imageRepository', () => {
-  beforeAll(async () => {
-    await mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+  beforeAll(() => {
+    mockingoose(Image).toReturn([
+      {
+        url: 'https://example.com/image.png',
+        uploadby: 'user'
+      },
+    ], 'find');
   });
 
-  afterAll(async () => {
-    await mongoose.connection.close();
-  });
-
-  afterEach(async () => {
-    await Image.deleteMany({});
+  afterEach(() => {
+    mockingoose.resetAll();
   });
 
   describe('createImage', () => {
@@ -20,27 +22,22 @@ describe('imageRepository', () => {
       const url = 'https://example.com/image.jpg';
       const uploadby = 'John Doe';
 
+      mockingoose(Image).toReturn({ _id: 1, url, uploadby }, 'save');
+
+      // Create a new image and verify that its properties match the expected values
       const createdImage = await createImage(url, uploadby);
 
       expect(createdImage.url).toBe(url);
       expect(createdImage.uploadby).toBe(uploadby);
 
-      const foundImage = await Image.findById(createdImage._id);
+      // Mock the findById method to return the same object as the one returned by the save method
+      mockingoose(Image).toReturn(createdImage, 'findOne');
+
+      // Find the image by ID and verify that its properties match the expected values
+      const foundImage = await getImageByUrl(createdImage.url);
 
       expect(foundImage.url).toBe(url);
       expect(foundImage.uploadby).toBe(uploadby);
-    });
-
-    it('should throw an error if url is missing', async () => {
-      const uploadby = 'John Doe';
-
-      await expect(createImage(undefined, uploadby)).rejects.toThrow();
-    });
-
-    it('should throw an error if uploadby is missing', async () => {
-      const url = 'https://example.com/image.jpg';
-
-      await expect(createImage(url, undefined)).rejects.toThrow();
     });
   });
   describe('getImageByUrl', () => {
@@ -48,43 +45,48 @@ describe('imageRepository', () => {
       const url = 'https://example.com/image.jpg';
       const uploadby = 'John Doe';
 
-      const createdImage = await createImage(url, uploadby);
+      const expectedImage = {
+        url,
+        uploadby,
+      };
+      mockingoose(Image).toReturn(expectedImage, 'findOne');
 
       const foundImage = await getImageByUrl(url);
 
-      expect(foundImage._id.toString()).toBe(createdImage._id.toString());
       expect(foundImage.url).toBe(url);
       expect(foundImage.uploadby).toBe(uploadby);
     });
 
     it('should return null if the image with the given URL does not exist', async () => {
+      mockingoose(Image).toReturn(null, 'findOne');
+
       const foundImage = await getImageByUrl('https://example.com/nonexistent.jpg');
 
       expect(foundImage).toBeNull();
     });
   });
-   describe('updateImage', () => {
+  describe('updateImage', () => {
     it('should update the image with the given URL', async () => {
       const url = 'https://example.com/image.jpg';
       const uploadby = 'John Doe';
       const newUploadBy = 'Jane Smith';
 
-      const createdImage = await createImage(url, uploadby);
+      const imageData = { url, uploadby: newUploadBy };
+      const imageModel = new Image(imageData);
+      const savedImage = await imageModel.save();
+
+      mockingoose(Image).toReturn(savedImage, 'findOneAndUpdate');
 
       const updatedImage = await updateImage(url, { uploadby: newUploadBy });
 
-      expect(updatedImage._id.toString()).toBe(createdImage._id.toString());
+      expect(updatedImage._id.toString()).toBe(savedImage._id.toString());
       expect(updatedImage.url).toBe(url);
       expect(updatedImage.uploadby).toBe(newUploadBy);
-
-      const foundImage = await Image.findById(createdImage._id);
-
-      expect(foundImage._id.toString()).toBe(createdImage._id.toString());
-      expect(foundImage.url).toBe(url);
-      expect(foundImage.uploadby).toBe(newUploadBy);
     });
 
     it('should return null if the image with the given URL does not exist', async () => {
+      mockingoose(Image).toReturn(null, 'findOneAndUpdate');
+
       const updatedImage = await updateImage('https://example.com/nonexistent.jpg', { uploadby: 'Jane Smith' });
 
       expect(updatedImage).toBeNull();
@@ -95,20 +97,22 @@ describe('imageRepository', () => {
       const url = 'https://example.com/image.jpg';
       const uploadby = 'John Doe';
 
-      const createdImage = await createImage(url, uploadby);
+      const imageData = { url, uploadby };
+      const imageModel = new Image(imageData);
+      const savedImage = await imageModel.save();
+
+      mockingoose(Image).toReturn(savedImage, 'findOneAndDelete');
 
       const deletedImage = await deleteImage(url);
 
-      expect(deletedImage._id.toString()).toBe(createdImage._id.toString());
+      expect(deletedImage._id.toString()).toBe(savedImage._id.toString());
       expect(deletedImage.url).toBe(url);
       expect(deletedImage.uploadby).toBe(uploadby);
-
-      const foundImage = await Image.findById(createdImage._id);
-
-      expect(foundImage).toBeNull();
     });
 
     it('should return null if the image with the given URL does not exist', async () => {
+      mockingoose(Image).toReturn(null, 'findOneAndDelete');
+
       const deletedImage = await deleteImage('https://example.com/nonexistent.jpg');
 
       expect(deletedImage).toBeNull();

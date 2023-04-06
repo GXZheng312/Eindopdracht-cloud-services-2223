@@ -1,9 +1,12 @@
 var express = require('express');
+const { myPublish } = require('../publisher');
+
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', async (req, res, next) => {
+    await myPublish();
+    res.send("hello");
 });
 
 module.exports = router;

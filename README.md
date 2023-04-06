@@ -12,9 +12,9 @@ To start the project, navigate to the project directory in your terminal and run
 |----------------|---------------|---------------|---------------|
 | messagebroker  |               |               |                    |
 | backend        | 3000          | 3000          |        |
-| auth-service   | 3020          | 3020          | authdb |
+| auth-service   | 3010          | 3010          | authdb |
 | authdb         | 27100         | 27017         |                      |
-| competition-service    | 3010          | 3010          | competitiondb |
+| competition-service    | 3020          | 3020          | competitiondb |
 | competitiondb  | 27200         | 27017                |                     |
 | image-service    | 3030          | 3030          | competitiondb |
 | imagendb  | 27300         | 27017                |                     |

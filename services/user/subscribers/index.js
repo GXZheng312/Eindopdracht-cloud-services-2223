@@ -1,20 +1,16 @@
 const amqp = require('amqplib');
-const { subscribeToTopic, publishToExchange } = require('../services/rabbitmq');
 const { getUserByUsername } = require('../repositories/user');
-
-console.log("loading all subscribers")
+const { handleRPC } = require('../services/rabbitmq');
 
 const useUser = async () => {
-    const exchangeName = "user";
-    const routingKey = `user.data.request.*`;
+    const queueName = "userdata_request";
 
-    subscribeToTopic(exchangeName, routingKey, async (username, prop, conn)  => {
-        const userData = await getUserByUsername(username);
-        console.log(userData)
-        console.log(prop)
-        publishToExchange(exchangeName, prop.replyTo, userData, prop.correlationId);
-        console.log("send data back")
+    handleRPC(queueName, async (data) => {
+        const userData = await getUserByUsername(data);
+        return userData
     })
 }
 
+console.log("loading all subscribers")
 useUser();
+console.log("loaded all subscribers")

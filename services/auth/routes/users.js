@@ -7,7 +7,7 @@ router.get('/', async (req, res, next) => {
    
     const userData = await publishUserDataRequest(username);
     
-    res.send(userData);
+    res.json(userData);
 });
 
 module.exports = router; 

@@ -1,37 +1,16 @@
 const amqp = require('amqplib');
 
 const connect = async () => {
-  const connection = await amqp.connect(process.env.RABBITMQ_URL);
-  const channel = await connection.createChannel();
-
-  return { connection, channel };
-};
-
-const publishToExchange = async (exchangeName, routingKey, data) => {
-  const { channel, connection } = await connect();
-
-  await channel.assertExchange(exchangeName, 'topic', { durable: false });
-  await channel.publish(exchangeName, routingKey, Buffer.from(JSON.stringify(data)));
-
-  setTimeout(() => {
-    connection.close();
-  }, 10000);
-};
-
-const subscribeToTopic = async (exchangeName, routingKey, callback) => {
-  const { channel } = await connect();
-
-  await channel.assertExchange(exchangeName,'topic', { durable: false })
-  const { queue } = await channel.assertQueue('', { exclusive: true });
-  await channel.bindQueue(queue, exchangeName, routingKey);
-
-  await channel.consume(queue, (message) => {
-    callback(JSON.parse(message.content.toString()));
-    channel.ack(message);
-  });
+  try{
+    const connection = await amqp.connect(process.env.RABBITMQ_URL);
+    const channel = await connection.createChannel();
+    
+    return { connection, channel };
+  } catch (error) {
+    console.log("Failed to connect to RabbitMQ:", error);
+  }
 };
 
 module.exports = {
-  publishToExchange,
-  subscribeToTopic,
+  connect
 };

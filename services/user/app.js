@@ -7,6 +7,9 @@ require('./services/database')();
 // init server
 const app = express();
 
+// json enable
+app.use(express.json());
+
 // Database setup
 require('./models/user');
 require('./models/role');
@@ -14,7 +17,6 @@ require('./seeds/');
 
 // subscribers
 require('./subscribers')
-
 
 //routes
 app.use('/', require('./routes/index'));

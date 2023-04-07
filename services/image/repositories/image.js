@@ -14,6 +14,11 @@ async function getImageByUrl(url) {
   return image;
 }
 
+async function getImageByUser(uploadby) {
+  const image = await Image.findOne({ uploadby });
+  return image;
+}
+
 async function updateImage(url, updates) {
   const image = await Image.findOneAndUpdate({ url }, {$set: updates}, { new: true });
   return image;
@@ -28,5 +33,6 @@ module.exports = {
   createImage,
   getImageByUrl,
   updateImage,
-  deleteImage
+  deleteImage,
+  getImageByUser
 };

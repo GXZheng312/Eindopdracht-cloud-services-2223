@@ -1,11 +1,11 @@
 const express = require('express');
-const { publishUserDataRequest } = require('../publisher');
+const { publicImageDataRequest } = require('../publisher');
 const router = express.Router();
 
 router.get('/', async (req, res, next) => {
-    const url = "https://www.seo-snel.nl/google-afbeeldingen/google-afbeeldingen.png"; 
+    const url = "google.com"; 
    
-    const imageData = await publishUserDataRequest(url);
+    const imageData = await publicImageDataRequest(url);
     
     res.json(imageData);
 });

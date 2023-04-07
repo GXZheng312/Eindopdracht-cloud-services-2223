@@ -1,6 +1,6 @@
 const { callRPC } = require("../services/rabbitmq");
 
-const publishUserDataRequest = async (url) => {
+const publicImageDataRequest = async (url) => {
     const queueName = "imageurl_request"
 
     const data = await callRPC(queueName, url);  
@@ -9,5 +9,5 @@ const publishUserDataRequest = async (url) => {
 };
 
 module.exports = { 
-    publishUserDataRequest
+    publicImageDataRequest
 }

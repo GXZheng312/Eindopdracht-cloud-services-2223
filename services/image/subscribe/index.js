@@ -6,7 +6,7 @@ const useImage = async () => {
     const queueName = "imageurl_request";
 
     handleRPC(queueName, async (data) => {
-        const imageData = await getImageByUrl(url);
+        const imageData = await getImageByUrl(data);
         return imageData
     })
 }

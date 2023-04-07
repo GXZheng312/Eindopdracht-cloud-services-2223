@@ -8,7 +8,7 @@ const useUser = async () => {
     handleRPC(queueName, async (data) => {
         const userData = await getUserByUsername(data);
         return userData
-    })
+    })  
 }
 
 console.log("loading all subscribers")

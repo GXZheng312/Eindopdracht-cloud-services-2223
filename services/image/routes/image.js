@@ -3,12 +3,6 @@ const router = express.Router();
 
 const imageRepository = require('../repositories/image');
 
-
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.send("hello im from image container")
-});
-
 router.get('/:url', async function(req, res, next) {
   const url = req.params.url;
   try {

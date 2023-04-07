@@ -16,7 +16,29 @@ const processDemoRequests = async () => {
     const routingPattern = "user.process.*"
 
     subscribeToTopic(exchangeName, routingPattern, (data, prop) => {
-        console.log("recieved a message for demo request.")
+        console.log("recieved a message for demo request: user.process.*")
+        console.log(data)
+        console.log(prop)
+    })
+}
+
+const processDemo2Requests = async () => {
+    const exchangeName = "user";
+    const routingPattern = "user.#"
+
+    subscribeToTopic(exchangeName, routingPattern, (data, prop) => {
+        console.log("recieved a message for demo request: user.#")
+        console.log(data)
+        console.log(prop)
+    })
+}
+
+const processDemo3Requests = async () => {
+    const exchangeName = "user";
+    const routingPattern = "user.not.*"
+
+    subscribeToTopic(exchangeName, routingPattern, (data, prop) => {
+        console.log("recieved a message for demo request: user.not.*")
         console.log(data)
         console.log(prop)
     })
@@ -25,4 +47,6 @@ const processDemoRequests = async () => {
 console.log("loading all subscribers")
 useUser();
 processDemoRequests();
+processDemo2Requests();
+processDemo3Requests();
 console.log("loaded all subscribers")

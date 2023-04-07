@@ -10,7 +10,7 @@ const publishUserDataRequest = async (username) => {
 
 const publishDemoRequest = async () => {
     const exchangeName = "user";
-    const routingKey = "user.process.demo"
+    const routingKey = "user.not.demo"
     const demoData = {username: "mister demo"}
 
     publishToTopic(exchangeName, routingKey, demoData);

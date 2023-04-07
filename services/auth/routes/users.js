@@ -1,9 +1,13 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const { publishUserDataRequest } = require('../publisher');
+const router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', async (req, res, next) => {
+    const username = "admin"; 
+   
+    const userData = await publishUserDataRequest(username);
+    
+    res.json(userData);
 });
 
-module.exports = router;
+module.exports = router; 

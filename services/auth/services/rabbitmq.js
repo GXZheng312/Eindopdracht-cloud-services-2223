@@ -32,12 +32,12 @@ const publishToTopic = async (exchangeName, routingKey, data, QueueName = '') =>
   });
 };
 
-const subscribeToTopic = async (exchangeName, routingKey, callback, QueueName = '') => {
+const subscribeToTopic = async (exchangeName, routingPattern, callback, QueueName = '') => {
   const channel = await (await getConnection()).createChannel();
   const responseQueue = await channel.assertQueue(QueueName, { exclusive: true });
   
   await channel.assertExchange(exchangeName, pattern, { durable: false });
-  await channel.bindQueue(responseQueue.queue, exchangeName, routingKey);
+  await channel.bindQueue(responseQueue.queue, exchangeName, routingPattern);
   await channel.consume(responseQueue.queue, (message) => {
     callback(JSON.parse(message.content.toString()), message.properties);
     channel.ack(message);

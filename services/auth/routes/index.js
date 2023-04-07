@@ -1,6 +1,6 @@
 const express = require('express');
 const { connection } = require('../services/rabbitmq');
-const { publishUserDataRequest } = require('../publisher');
+const { publishUserDataRequest, publishDemoRequest } = require('../publisher');
 const router = express.Router();
 
 /* GET home page. */
@@ -11,5 +11,11 @@ router.get('/', async (req, res, next) => {
   
   res.json(userData);
 });
+
+router.get('/demo-topic', async (req, res, next) => {
+  publishDemoRequest();
+  res.send("demo");
+});
+
 
 module.exports = router;

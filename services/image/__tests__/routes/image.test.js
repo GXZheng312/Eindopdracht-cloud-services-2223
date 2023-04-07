@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const mockingoose = require('mockingoose');
 const { createImage, getImageByUrl, updateImage, deleteImage } = require('../../repositories/image');
 const Image = require('../../models/image');
@@ -55,7 +54,7 @@ describe('imageRepository', () => {
 
       expect(foundImage.url).toBe(url);
       expect(foundImage.uploadby).toBe(uploadby);
-    });
+    }); 
 
     it('should return null if the image with the given URL does not exist', async () => {
       mockingoose(Image).toReturn(null, 'findOne');

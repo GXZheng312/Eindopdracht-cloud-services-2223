@@ -1,17 +1,13 @@
-const { publishToExchange, subscribeToTopic } = require("../services/rabbitmq");
+const { callRPC } = require("../services/rabbitmq");
 
-const publishImageRequest = async (imageurl) => {
-    const exchangeName = 'images';
-    const routingKey = `test.${imageurl}`;
+const publishUserDataRequest = async (url) => {
+    const queueName = "imageurl_request"
 
-    return new Promise((resolve) => {
-        subscribeToTopic(exchangeName, routingKey, (data) => {
-            resolve(data);
-        });
-        publishToExchange(exchangeName, routingKey, imageurl);
-    });
-}
+    const data = await callRPC(queueName, url);  
+    
+    return data;
+};
 
 module.exports = { 
-    publishImageRequest
+    publishUserDataRequest
 }

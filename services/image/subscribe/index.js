@@ -1,30 +1,16 @@
 const amqp = require('amqplib');
-
-console.log("loading all subscribers")
+const { getImageByUrl } = require('../repositories/image');
+const { handleRPC } = require('../services/rabbitmq');
 
 const useImage = async () => {
-    const connection = await amqp.connect(process.env.RABBITMQ_URL);
-    const channel = await connection.createChannel();
-    const exchangeName = "image"
+    const queueName = "imageurl_request";
 
-    await channel.assertExchange(exchangeName, 'topic', {
-        durable: false
-    });
-
-    const queueName = await channel.assertQueue('', { exclusive: true });
-
-    await channel.bindQueue(queueName.queue, exchangeName, "test.*");
-    await channel.consume(queueName.queue, message => {
-        console.log('recieved a message from rabbitmq');
-        console.log(message)
-        const obj = JSON.parse(message.content.toString())
-        console.log(obj)
-        
-        channel.publish(exchangeName, obj.replyTo, Buffer.from("you recieved mail"), {
-            contentType: 'application/json',
-            persistent: true,
-        }); 
+    handleRPC(queueName, async (data) => {
+        const imageData = await getImageByUrl(url);
+        return imageData
     })
 }
 
+console.log("loading all images")
 useImage();
+console.log("loaded all images")

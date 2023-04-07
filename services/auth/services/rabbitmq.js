@@ -44,7 +44,6 @@ const subscribeToTopic = async (exchangeName, routingKey, callback, QueueName = 
   });
 };
 
-
 const callRPC = async (queueName, data) => {
   const channel = await (await getConnection()).createChannel();
   const { queue } = await channel.assertQueue('', { exclusive: true });
@@ -56,11 +55,15 @@ const callRPC = async (queueName, data) => {
     correlationId: uuid
   });
 
-  const response = await new Promise((resolve) => {
+  const response = await new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject("Unable to get response back")
+    }, 5000);
+
     channel.consume(queue, msg => {
       if(msg.properties.correlationId == uuid){
         const response = JSON.parse(msg.content.toString());
-        console.log(response);
+        clearTimeout(timeoutId)
         resolve(response);
       }
     }, {noAck: true})
@@ -76,10 +79,9 @@ const handleRPC = async (queueName, process) => {
 
   await channel.assertQueue(queueName, {durable: true});
   channel.prefetch(1);
+  channel.consume(queueName, async (msg) => {
 
-  channel.consume(queueName, msg => {
-    const data = process(JSON.parse(msg.content.toString()))
-
+    const data = await process(JSON.parse(msg.content.toString()))
     channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(data)), {
       contentType: 'application/json',
       correlationId: msg.properties.correlationId

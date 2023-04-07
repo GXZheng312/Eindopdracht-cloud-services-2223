@@ -1,4 +1,5 @@
 const express = require('express');
+const { initMQ } = require('./services/rabbitmq');
 
 // config setup
 require('dotenv').config();
@@ -15,8 +16,8 @@ require('./models/user');
 require('./models/role');
 require('./seeds/');
 
-// subscribers
-require('./subscribers')
+// MQ
+initMQ(() => require('./subscribers'))
 
 //routes
 app.use('/', require('./routes/index'));

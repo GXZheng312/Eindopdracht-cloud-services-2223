@@ -1,6 +1,5 @@
-const amqp = require('amqplib');
 const { getUserByUsername } = require('../repositories/user');
-const { handleRPC, subscribeToTopic } = require('../services/rabbitmq');
+const { handleRPC, subscribeToTopic, initMQ } = require('../services/rabbitmq');
 
 const useUser = async () => {
     const queueName = "userdata_request";
@@ -44,9 +43,13 @@ const processDemo3Requests = async () => {
     })
 }
 
-console.log("loading all subscribers")
-useUser();
-processDemoRequests();
-processDemo2Requests();
-processDemo3Requests();
-console.log("loaded all subscribers")
+const loadAll = async () => {
+    console.log("loading all subscribers");
+    await useUser();
+    await processDemoRequests();
+    await processDemo2Requests();
+    await processDemo3Requests();
+    console.log("loaded all subscribers")
+}
+
+loadAll();

@@ -3,26 +3,50 @@ const amqp = require('amqplib');
 const pattern = 'topic'
 
 let connection;
+let channel;
 
-const initConnection = async () => {
-  try{
-    const conn = await amqp.connect(process.env.RABBITMQ_URL);
-    console.log("Connected to RabbitMQ");
-    return conn;
-  } catch (error) { 
-    console.log("Failed to connect to RabbitMQ:", error);
-  }
+const initMQ = async (callback) => {
+  connection = await new Promise((resolve, reject) => {
+    amqp.connect(process.env.RABBITMQ_URL)
+      .then(conn => {
+        console.log("Connected to RabbitMQ");
+        resolve(conn);
+      })
+      .catch(error => {
+        console.log("Failed to connect to RabbitMQ:", error);
+        reject(error);
+      });
+  });
+
+  channel = await new Promise((resolve, reject) => {
+    connection.createChannel()
+      .then(ch => {
+        console.log("Channel Created");
+        resolve(ch);
+      })
+      .catch(error => {
+        console.log("Failed to create channel:", error);
+        reject(error);
+      });
+  })
+
+  callback()
 };
 
-const getConnection = async () => {
-  if (!connection) {
-    connection = await initConnection();
+const getChannel = async () => {
+  /*if (!connection || !channel) {
+    await initMQ();
+  }*/
+
+  if(!channel) {
+    throw("Channel not created")
   }
-  return connection;
+
+  return channel;
 };
- 
+
 const publishToTopic = async (exchangeName, routingKey, data, QueueName = '') => {
-  const channel = await (await getConnection()).createChannel();
+  const channel = await getChannel();
 
   await channel.assertQueue(QueueName, { exclusive: true });
   await channel.assertExchange(exchangeName, pattern, { durable: false });
@@ -33,9 +57,9 @@ const publishToTopic = async (exchangeName, routingKey, data, QueueName = '') =>
 };
 
 const subscribeToTopic = async (exchangeName, routingPattern, callback, QueueName = '') => {
-  const channel = await (await getConnection()).createChannel();
+  const channel = await getChannel();
   const responseQueue = await channel.assertQueue(QueueName, { exclusive: true });
-  
+
   await channel.assertExchange(exchangeName, pattern, { durable: false });
   await channel.bindQueue(responseQueue.queue, exchangeName, routingPattern);
   await channel.consume(responseQueue.queue, (message) => {
@@ -45,11 +69,11 @@ const subscribeToTopic = async (exchangeName, routingPattern, callback, QueueNam
 };
 
 const callRPC = async (queueName, data) => {
-  const channel = await (await getConnection()).createChannel();
+  const channel = await getChannel();
   const { queue } = await channel.assertQueue('', { exclusive: true });
   const uuid = generateUuid()
 
- channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)), {
+  channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)), {
     contentType: 'application/json',
     replyTo: queue,
     correlationId: uuid
@@ -61,23 +85,23 @@ const callRPC = async (queueName, data) => {
     }, 5000);
 
     channel.consume(queue, msg => {
-      if(msg.properties.correlationId == uuid){
+      if (msg.properties.correlationId == uuid) {
         const response = JSON.parse(msg.content.toString());
         clearTimeout(timeoutId)
         resolve(response);
       }
-    }, {noAck: true})
+    }, { noAck: true })
   });
-  
+
   channel.close();
 
   return response;
 };
 
 const handleRPC = async (queueName, process) => {
-  const channel = await (await getConnection()).createChannel();
+  const channel = await getChannel();
 
-  await channel.assertQueue(queueName, {durable: true});
+  await channel.assertQueue(queueName, { durable: true });
   channel.prefetch(1);
   channel.consume(queueName, async (msg) => {
 
@@ -89,7 +113,7 @@ const handleRPC = async (queueName, process) => {
 
     channel.ack(msg);
 
-  }, {noAck: false})
+  }, { noAck: false })
 };
 
 const generateUuid = () => {
@@ -97,6 +121,7 @@ const generateUuid = () => {
 };
 
 module.exports = {
+  initMQ,
   publishToTopic,
   subscribeToTopic,
   callRPC,

@@ -9,5 +9,4 @@ router.get('/', async (req, res, next) => {
     
     res.json(imageData);
 });
-
 module.exports = router; 

@@ -71,6 +71,7 @@ const callRPC = async (queueName, data) => {
 };
 
 const handleRPC = async (queueName, process) => {
+  console.log('test');
   const channel = await (await getConnection()).createChannel();
 
   await channel.assertQueue(queueName, {durable: true});

@@ -1,5 +1,6 @@
 const { callRPC } = require("../services/rabbitmq");
 
+// queue imageurl
 const publicImageDataRequest = async (url) => {
     const queueName = "imageurl_request"
 

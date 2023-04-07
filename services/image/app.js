@@ -9,6 +9,7 @@ const app = express();
 app.use(express.json());
 // Database setup
 //require('./seeds/');
+require('./subscribers/index');
 
 //routes
 app.use('/', require('./routes/index'));

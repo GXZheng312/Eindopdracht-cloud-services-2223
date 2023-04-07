@@ -46,11 +46,8 @@ const subscribeToTopic = async (exchangeName, routingKey, callback, QueueName = 
 
 
 const callRPC = async (queueName, data) => {
-  console.log('in call');
   const channel = await (await getConnection()).createChannel();
-  console.log('channel created');
   const { queue } = await channel.assertQueue('', { exclusive: true });
-  console.log('queue asserted');
   const uuid = generateUuid()
 
  channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)), {
@@ -58,17 +55,17 @@ const callRPC = async (queueName, data) => {
     replyTo: queue,
     correlationId: uuid
   });
-  console.log('queue send');
 
   const response = await new Promise((resolve) => {
     channel.consume(queue, msg => {
       if(msg.properties.correlationId == uuid){
         const response = JSON.parse(msg.content.toString());
         resolve(response);
+        console.log('response');
       }
     }, {noAck: true})
   });
-  console.log('response');
+  
 
   channel.close();
 

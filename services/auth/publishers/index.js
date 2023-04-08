@@ -2,11 +2,11 @@ const { callRPC, publishToTopic } = require("../services/rabbitmq");
 
 const publishUserDataRequest = async (username) => {
     const queueName = "userdata_request";
-
+    
     const data = await callRPC(queueName, username);  
     
     return data;
-};
+}; 
 
 const publishDemoRequest = async () => {
     const exchangeName = "user";

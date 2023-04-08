@@ -5,7 +5,7 @@ const pattern = 'topic'
 let connection;
 let channel;
 
-const initMQ = async (loadSubscribers) => {
+const initMQ = async (callback) => {
   connection = await new Promise((resolve, reject) => {
     amqp.connect(process.env.RABBITMQ_URL)
       .then(conn => {
@@ -30,7 +30,7 @@ const initMQ = async (loadSubscribers) => {
       });
   })
 
-  loadSubscribers()
+  callback()
 };
 
 const getChannel = async () => {
@@ -69,33 +69,38 @@ const subscribeToTopic = async (exchangeName, routingPattern, callback, QueueNam
 };
 
 const callRPC = async (queueName, data) => {
-  const channel = await getChannel();
-  const { queue } = await channel.assertQueue('', { exclusive: true });
-  const uuid = generateUuid()
+  try {
+    const channel = await getChannel();
+    const { queue } = await channel.assertQueue('', { exclusive: true });
+    const uuid = generateUuid()
 
-  channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)), {
-    contentType: 'application/json',
-    replyTo: queue,
-    correlationId: uuid
-  });
+    channel.sendToQueue(queueName, Buffer.from(JSON.stringify(data)), {
+      contentType: 'application/json',
+      replyTo: queue,
+      correlationId: uuid
+    });
 
-  const response = await new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      reject("Unable to get response back")
-    }, 5000);
+    const response = await new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject("Unable to get response back")
+      }, 5000);
 
-    channel.consume(queue, msg => {
-      if (msg.properties.correlationId == uuid) {
-        const response = JSON.parse(msg.content.toString());
-        clearTimeout(timeoutId)
-        resolve(response);
-      }
-    }, { noAck: true })
-  });
+      channel.consume(queue, msg => {
+        if (msg.properties.correlationId == uuid) {
+          const response = JSON.parse(msg.content.toString());
+          clearTimeout(timeoutId)
+          resolve(response);
+        }
+      }, { noAck: true })
+    });
 
-  channel.close();
+    channel.close();
 
-  return response;
+    return response;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 };
 
 const handleRPC = async (queueName, process) => {

@@ -1,6 +1,5 @@
 const express = require('express');
-const { connection } = require('../services/rabbitmq');
-const { publishUserDataRequest, publishDemoRequest } = require('../publisher');
+const { publishUserDataRequest, publishDemoRequest } = require('../publishers');
 const router = express.Router();
 
 /* GET home page. */

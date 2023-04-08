@@ -1,5 +1,5 @@
 const amqp = require('amqplib');
-const { getImageByUrl } = require('../repositories/image');
+const { getImageByUrl, createImage } = require('../repositories/image');
 const { handleRPC } = require('../services/rabbitmq');
 const { subscribeToTopic } = require('../services/rabbitmq');
 const { uploadImage } = require('../services/image');
@@ -17,10 +17,11 @@ const processImageTopic = () => {
     const exchangeName = "image";
     const routingPattern = "image.upload.*"
  
-    subscribeToTopic(exchangeName, routingPattern, (data, prop) => {
-        const { imageData, uploadby } = data;
+    subscribeToTopic(exchangeName, routingPattern, async (data, prop) => {
+        const { imageName, imageData, uploadby } = data;
        
-        uploadImage(imageData, uploadby);
+        await uploadImage(imageData, imageName);
+        await createImage(imageName, uploadby);
     })
 }
 

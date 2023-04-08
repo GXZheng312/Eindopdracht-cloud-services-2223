@@ -6,8 +6,10 @@ const convertToBase64 = async (imageData) => {
   return imageBuffer;
 };
 
-const uploadImage = async (rawImageData) => {
-  const uniqueFilename = Date.now().toString() + Math.floor(Math.random() * 1000).toString() + '.jpg';
+const uploadImage = async (rawImageData, imagename = null) => {
+  if(!imagename) {
+    imagename = Date.now().toString() + Math.floor(Math.random() * 1000).toString() + '.jpg';
+  }
   
   const imageDirectory = path.join(__dirname, '../public/images/');
   
@@ -15,10 +17,10 @@ const uploadImage = async (rawImageData) => {
     fs.mkdirSync(imageDirectory);
   }
   
-  const imagePath = path.join(imageDirectory, uniqueFilename);
+  const imagePath = path.join(imageDirectory, imagename);
   await fs.promises.writeFile(imagePath, rawImageData);
   
-  return uniqueFilename;
+  return imagename;
 }
 
 module.exports = {

@@ -4,6 +4,7 @@ const router = express.Router();
 const userRepository = require('../repositories/user');
 const roleRepository = require('../repositories/role');
 
+// user/
 router.get('/:username', async function(req, res, next) {
   const username = req.params.username;
   try {

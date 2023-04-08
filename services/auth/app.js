@@ -15,7 +15,7 @@ app.use(express.json());
 //require('./seeds/');
 
 // MQ
-initMQ(() => {})
+initMQ(() => require('./subscribers'))
 
 //routes
 app.use('/', require('./routes/index'));

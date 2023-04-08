@@ -10,6 +10,7 @@
   "dependencies": {
     "amqplib": "^0.10.3",
     "express": "~4.16.1",
+    "express-validator": "^6.15.0",
     "mongoose": "^7.0.3"
   },
   "devDependencies": {

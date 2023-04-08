@@ -8,12 +8,24 @@ const authtokenSchema = new mongoose.Schema({
     },
     expiredata: {
         type: Date,
+        validate: {
+            validator: (value) => {
+                return value > Date.now(); 
+            },
+            message: 'Expiration date must be in the future',
+        },
         required: true,
     },
     username: {
         type: String,
         required: true,
         unique: true,
+        validate: {
+            validator: (value) => {
+                return value.length >= 4;
+            },
+            message: 'Username must be at least 4 characters long',
+        },
     }
 });
 

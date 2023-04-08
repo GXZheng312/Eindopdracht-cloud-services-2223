@@ -16,6 +16,7 @@ services:
     environment:
       - PORT=3000
       - USER_SERVER=user-service:3040
+      - JWT_SECRET=cloudservices
     volumes:
       - "./api-gateway:/usr/src/app/"
 
@@ -31,6 +32,7 @@ services:
       - PORT=3010
       - MONGO_URL=mongodb://authdb:27017
       - RABBITMQ_URL=amqp://messagebroker
+      - JWT_SECRET=cloudservices
     depends_on:
       - authdb
     volumes:
@@ -48,6 +50,7 @@ services:
       - PORT=3020
       - MONGO_URL=mongodb://competitiondb:27017
       - RABBITMQ=amqp://messagebroker
+      - JWT_SECRET=cloudservices
     depends_on:
       - competitiondb
     volumes:
@@ -65,6 +68,7 @@ services:
       - PORT=3030
       - MONGO_URL=mongodb://imagedb:27017
       - RABBITMQ_URL=amqp://messagebroker
+      - JWT_SECRET=cloudservices
     depends_on:
       - imagedb
     volumes:
@@ -82,6 +86,7 @@ services:
       - PORT=3040
       - MONGO_URL=mongodb://userdb:27017
       - RABBITMQ_URL=amqp://messagebroker
+      - JWT_SECRET=cloudservices
     depends_on:
       - userdb
     volumes:

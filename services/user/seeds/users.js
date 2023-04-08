@@ -14,6 +14,11 @@ const userSeed = async () => {
       const newSuperAdminUser = new User({
         username: username,
         password: password,
+        address: {
+          street: "Tjalk 157",
+          city: "Lelystad",
+          zip: "8232NB",
+        },
         role: role._id,
       });
       await newSuperAdminUser.save()
@@ -36,6 +41,11 @@ const adminSeed = async () => {
       const newAdminUser = new User({
         username: username,
         password: password,
+        address: {
+          street: "Eykmanstraat 141",
+          city: "Wageningen",
+          zip: "6706JX",
+        },
         role: role._id,
       });
       await newAdminUser.save()

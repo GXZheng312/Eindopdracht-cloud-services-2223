@@ -10,13 +10,14 @@ const validateToken = (authHeader, res) =>{
     if (!token) {
       return res.status(401).json({ error: 'Missing token' });
     }
-    
+
     return decodeToken(token);
 }
 
 const authenticateToken = async (req, res, next) => {
   try {
-    validateToken(req.headers.authorization, res);
+    const decodedToken = validateToken(req.headers.authorization, res);
+    req.user = decodedToken.user;
 
     next();
   } catch (error) {
@@ -28,6 +29,7 @@ const authenticateToken = async (req, res, next) => {
 const authenticateTokenRole = (roleName) => async (req, res, next) => {
   try {
     const decodedToken = validateToken(req.headers.authorization, res);
+    req.user = decodedToken.user;
 
     if (decodedToken.role !== roleName) {
       return res.status(403).json({ error: 'Unauthorized' });

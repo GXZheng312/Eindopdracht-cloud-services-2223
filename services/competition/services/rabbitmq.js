@@ -6,35 +6,31 @@ let connection;
 let channel;
 
 const initMQ = async (callback) => {
-  try {
-    connection = await new Promise((resolve, reject) => {
-      amqp.connect(process.env.RABBITMQ_URL)
-        .then(conn => {
-          console.log("Connected to RabbitMQ");
-          resolve(conn);
-        })
-        .catch(error => {
-          console.log("Failed to connect to RabbitMQ:", error);
-          reject(error);
-        });
-    });
+  connection = await new Promise((resolve, reject) => {
+    amqp.connect(process.env.RABBITMQ_URL)
+      .then(conn => {
+        console.log("Connected to RabbitMQ");
+        resolve(conn);
+      })
+      .catch(error => {
+        console.log("Failed to connect to RabbitMQ:", error);
+        reject(error);
+      });
+  });
 
-    channel = await new Promise((resolve, reject) => {
-      connection.createChannel()
-        .then(ch => {
-          console.log("Channel Created");
-          resolve(ch);
-        })
-        .catch(error => {
-          console.log("Failed to create channel:", error);
-          reject(error);
-        });
-    })
+  channel = await new Promise((resolve, reject) => {
+    connection.createChannel()
+      .then(ch => {
+        console.log("Channel Created");
+        resolve(ch);
+      })
+      .catch(error => {
+        console.log("Failed to create channel:", error);
+        reject(error);
+      });
+  })
 
-    callback()
-  } catch {
-    console.log("cant connect")
-  }
+  callback()
 };
 
 const getChannel = async () => {

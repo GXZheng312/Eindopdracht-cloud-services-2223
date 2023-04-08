@@ -7,6 +7,9 @@ require('dotenv').config();
 // init server
 const app = express();
 
+// json enable
+app.use(express.json());
+
 // Database setup
 //require('./seeds/');
 

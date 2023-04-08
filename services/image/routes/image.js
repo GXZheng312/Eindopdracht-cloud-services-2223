@@ -1,43 +1,93 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
 const imageRepository = require('../repositories/image');
-const path = require('path');
+const { convertToBase64, uploadImage } = require('../services/image');
 const { authenticateToken } = require('../middleware/auth');
-const { uploadImage } = require('../services/image');
 
-router.get('/:url', async function(req, res, next) {
-  const url = req.params.url;
+// get /images/
+router.get('/', async (req, res) => {
   try {
-    const image = await imageRepository.getImageByUrl(url);
-    if (image) {
-      res.status(200).json(image);
-    } else {
-      res.status(404).json({ message: 'Image not found' });
-    }
+    const images = await getAllImages();
+    res.json(images);
   } catch (error) {
-    next(error);
+    console.error(error);
+    res.status(500).send('Error getting images');
   }
 });
 
-function isBase64Image(str) {
-  return /^data:image\/(png|jpg|jpeg|gif);base64,/.test(str);
-}
-
-router.post('/', authenticateToken, async function(req, res, next) {
-  const { url } = req.body;
-  const uploadby = req.user;
+// GET /images/:url
+router.get('/:url', async (req, res) => {
   try {
-    if (isBase64Image(url)) {
-      const image = uploadImage(url, uploadby);
-      res.status(201).json(image);
-    } else {
-      res.status(400).json({ message: 'Invalid image format' });
+    const image = await imageRepository.getImageByUrl(req.params.url);
+    if (!image) {
+      return res.status(404).json({ message: 'Image not found' });
     }
-  } catch (error) {
-    next(error);
+    res.json(image);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
+// POST /images/
+router.post('/', authenticateToken, async (req, res) => {
+  try {
+    const imageData = req.body.imagedata;
+    const uploadby = req.user;
+    
+    const binaryData = await convertToBase64(imageData);
+    const newImageFilename = await uploadImage(binaryData);
+    const image = await imageRepository.createImage(newImageFilename, uploadby);
+    
+    res.status(201).json(image);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error uploading image' });
+  }
+});
+
+
+// GET /images/user/:uploadby
+router.get('/user/:uploadby', async (req, res) => {
+  try {
+    const image = await imageRepository.getImageByUser(req.params.uploadby);
+    if (!image) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+    res.json(image);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// PUT /images/:url
+router.put('/:url', async (req, res) => {
+  try {
+    const updates = req.body;
+    const image = await imageRepository.updateImage(req.params.url, updates);
+    if (!image) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+    res.json(image);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// DELETE /images/:url
+router.delete('/:url', async (req, res) => {
+  try {
+    const image = await imageRepository.deleteImage(req.params.url);
+    if (!image) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+    res.json(image);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
 
 module.exports = router;

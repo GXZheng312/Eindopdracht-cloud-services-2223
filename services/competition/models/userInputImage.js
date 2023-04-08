@@ -4,13 +4,12 @@ const userInputImageSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        primary: true
     },
     score: {
         type: String,
         required: true
     },
-    imageurl: {
+    imagename: {
         type: String,
         required: true
     },

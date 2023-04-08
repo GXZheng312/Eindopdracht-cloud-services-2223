@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const targetImageSchema = new mongoose.Schema({
-    imageurl: {
+    imagename: {
         type: String,
         required: true,
         primary: true

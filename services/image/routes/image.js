@@ -3,6 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const imageRepository = require('../repositories/image');
 const path = require('path');
+const { authenticateToken } = require('../middleware/auth');
 
 router.get('/:url', async function(req, res, next) {
   const url = req.params.url;
@@ -22,8 +23,9 @@ function isBase64Image(str) {
   return /^data:image\/(png|jpg|jpeg|gif);base64,/.test(str);
 }
 
-router.post('/', async function(req, res, next) {
-  const { url, uploadby } = req.body;
+router.post('/', authenticateToken, async function(req, res, next) {
+  const { url } = req.body;
+  const uploadby = req.user;
   try {
     if (isBase64Image(url)) {
       const filename = `${Date.now()}.png`;

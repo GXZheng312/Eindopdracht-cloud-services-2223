@@ -16,6 +16,7 @@
     "file-type": "^18.2.1",
     "fs": "^0.0.1-security",
     "jest-mock-extended": "^3.0.4",
+    "jsonwebtoken": "^9.0.0",
     "mockingoose": "^2.16.2",
     "mongodb-memory-server": "^8.12.2",
     "mongoose": "^7.0.3",

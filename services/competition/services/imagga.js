@@ -23,26 +23,21 @@ const createFaceId = async (url) => {
     })();
 }
 const compareImages = async (targetImageUrl, imageUrl) => {
-    //const got = require('got');
-
     const apiKey = process.env.IMAGGA_API_KEY;
     const apiSecret = process.env.IMAGGA_API_SECRET;
 
-    const faceId = targetImageUrl;
-    const secondFaceId = imageUrl;
+    const categorizer = "general_v3";
+    const url = 'https://api.imagga.com/v2/images-similarity/categories/' + categorizer + '?image_url=' + encodeURIComponent(targetImageUrl) + '&image2_url='+encodeURIComponent(imageUrl);
 
-    const url = 'https://api.imagga.com/v2/faces/similarity?face_id=' + faceId + '&second_face_id=' + secondFaceId;
-
-    (async () => {
-        try {
-            const { default: got } = await import('got');
-            const response = await got(url, {username: apiKey, password: apiSecret});
-            return response;
-        } catch (error) {
-            console.log(error);
-        }
-    })();
-
+    try {
+        const { default: got } = await import('got');
+        const response = await got(url, {username: apiKey, password: apiSecret});
+        console.log(response.body);
+        return JSON.parse(response.body).result.distance;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
 }
 
 module.exports = {

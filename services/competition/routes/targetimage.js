@@ -45,10 +45,10 @@ router.get('/', async function(req, res) {
 router.get('/compare', async (req, res) => {
     const { targetImageUrl, imageUrl } = req.query
     try {
-        const targetImageFaceId = await createFaceId(targetImageUrl);
-        const imageFaceId = await createFaceId(imageUrl);  
-        //const score = await compareImages(targetImageFaceId, imageFaceId);
-        //res.json({ score })
+        //const targetImageFaceId = await createFaceId(targetImageUrl);
+        //const imageFaceId = await createFaceId(imageUrl);  
+        const score = await compareImages(targetImageUrl, imageUrl);
+        await res.json({ score });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to compare images' })

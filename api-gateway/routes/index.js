@@ -6,4 +6,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+// add here all other routes
+router.use('/login', require('./login'));
+
 module.exports = router;

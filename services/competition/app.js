@@ -9,6 +9,9 @@ require('./services/database')();
 const app = express();
 app.use(bodyParser.json());
 
+// json enable
+app.use(express.json());
+
 // Database setup
 //require('./seeds/');
 

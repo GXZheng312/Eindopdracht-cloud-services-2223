@@ -47,7 +47,6 @@ router.get('/compare', async (req, res) => {
     try {
         const targetImageFaceId = await createFaceId(targetImageUrl);
         const imageFaceId = await createFaceId(imageUrl);  
-        console.log(targetImageFaceId);   
         //const score = await compareImages(targetImageFaceId, imageFaceId);
         //res.json({ score })
     } catch (error) {

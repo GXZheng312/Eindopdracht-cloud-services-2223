@@ -1,6 +1,6 @@
 const User = require('../models/user');
 
-async function createUser(username, password, roleId) {
+const createUser = async (username, password, roleId) => {
   const user = new User({
     username,
     password,
@@ -8,26 +8,26 @@ async function createUser(username, password, roleId) {
   });
   await user.save();
   return user;
-}
+};
 
-async function getUserByUsername(username) {
-  const user = await User.findOne({ username });
+const getUserByUsernameAndPassword = async (username, password) => {
+  const user = await User.findOne({ username, password }).populate('role'); 
   return user;
-}
+};
 
-async function updateUser(username, updates) {
+const updateUser = async (username, updates) => {
   const user = await User.findOneAndUpdate({ username }, updates, { new: true });
   return user;
-}
+};
 
-async function deleteUser(username) {
+const deleteUser = async (username) => {
   const user = await User.findOneAndDelete({ username });
   return user;
-}
+};
 
 module.exports = {
   createUser,
-  getUserByUsername,
+  getUserByUsernameAndPassword,
   updateUser,
   deleteUser
 };

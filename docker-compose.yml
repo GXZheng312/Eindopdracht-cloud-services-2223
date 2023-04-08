@@ -15,6 +15,7 @@ services:
       - 3000:3000
     environment:
       - PORT=3000
+      - USER_SERVER=user-service:3040
     volumes:
       - "./api-gateway:/usr/src/app/"
 
@@ -89,7 +90,6 @@ services:
   authdb:
     container_name: authdb
     image: mongo:latest
-    restart: always
     ports:
       - 27100:27017
     volumes:
@@ -97,7 +97,6 @@ services:
 
   competitiondb:
     container_name: competitiondb
-    restart: always
     image: mongo:latest
     ports:
       - 27200:27017
@@ -106,7 +105,6 @@ services:
 
   imagedb:
     container_name: imagedb
-    restart: always
     image: mongo:latest
     ports:
       - 27300:27017
@@ -115,7 +113,6 @@ services:
 
   userdb:
     container_name: userdb
-    restart: always
     image: mongo:latest
     ports:
       - 27400:27017

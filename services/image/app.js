@@ -6,7 +6,10 @@ require('./services/database')();
 
 // init server
 const app = express();
+
+// json enable
 app.use(express.json());
+
 // Database setup
 //require('./seeds/');
 require('./subscribers/index');

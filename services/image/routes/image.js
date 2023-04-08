@@ -26,10 +26,11 @@ router.post('/', async function(req, res, next) {
   const { url, uploadby } = req.body;
   try {
     if (isBase64Image(url)) {
-      const imagePath = path.join(__dirname, '../public/static', `${Date.now()}.png`);
+      const filename = `${Date.now()}.png`;
+      const imagePath = path.join(__dirname, '../public/static', filename);
       const imageBuffer = Buffer.from(url.split(',')[1], 'base64');
       fs.writeFileSync(imagePath, imageBuffer);
-      const image = await imageRepository.createImage(imagePath, uploadby);
+      const image = await imageRepository.createImage(filename, uploadby);
       res.status(201).json(image);
     } else {
       res.status(400).json({ message: 'Invalid image format' });

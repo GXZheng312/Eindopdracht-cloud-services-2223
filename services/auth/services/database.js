@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 module.exports = () => {
   if (mongoose.connection.readyState === 0) {
-    const uri = process.env.MONGO_URL + '/userdb';
+    const uri = process.env.MONGO_URL + '/authdb';
     /* const options = {
       db: { native_parser: true },
       server: { poolSize: 5 },

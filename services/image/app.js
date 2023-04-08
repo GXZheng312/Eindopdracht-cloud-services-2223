@@ -1,4 +1,5 @@
 const express = require('express');
+const { initMQ } = require('./services/rabbitmq');
 
 // config setup
 require('dotenv').config();
@@ -10,9 +11,10 @@ const app = express();
 // json enable
 app.use(express.json());
 
-// Database setup
-//require('./seeds/');
-require('./subscribers/index');
+// static files enable
+app.use(express.static('public'));
+
+initMQ(() => require('./subscribers'))
 
 //routes
 app.use('/', require('./routes/index'));

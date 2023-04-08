@@ -1,4 +1,4 @@
-const { callRPC } = require("../services/rabbitmq");
+const { callRPC, publishToTopic } = require("../services/rabbitmq");
 
 // queue imageurl
 const publicImageDataRequest = async (url) => {
@@ -9,6 +9,15 @@ const publicImageDataRequest = async (url) => {
     return data;
 };
 
+const publishImageData = async (data) => {
+    const exchangeName = "image";
+    const routingKey = "image.upload.data";
+
+    publishToTopic(exchangeName, routingKey, data);
+    console.log("sended a message for demo request.") 
+};
+
 module.exports = { 
-    publicImageDataRequest
+    publicImageDataRequest,
+    publishImageData
 }

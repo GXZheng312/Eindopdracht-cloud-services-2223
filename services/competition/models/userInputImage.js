@@ -13,6 +13,11 @@ const userInputImageSchema = new mongoose.Schema({
     imageurl: {
         type: String,
         required: true
+    },
+    targetimage: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'TargetImage',
     }
 });
 

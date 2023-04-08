@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const { initMQ } = require('./services/rabbitmq');
 
 // config setup
 require('dotenv').config();
@@ -12,8 +13,7 @@ app.use(bodyParser.json());
 // json enable
 app.use(express.json());
 
-// Database setup
-//require('./seeds/');
+initMQ(() => {});//() => require('./subscribers'))
 
 //routes
 app.use('/', require('./routes/index'));

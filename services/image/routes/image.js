@@ -4,6 +4,7 @@ const fs = require('fs');
 const imageRepository = require('../repositories/image');
 const path = require('path');
 const { authenticateToken } = require('../middleware/auth');
+const { uploadImage } = require('../services/image');
 
 router.get('/:url', async function(req, res, next) {
   const url = req.params.url;
@@ -28,11 +29,7 @@ router.post('/', authenticateToken, async function(req, res, next) {
   const uploadby = req.user;
   try {
     if (isBase64Image(url)) {
-      const filename = `${Date.now()}.png`;
-      const imagePath = path.join(__dirname, '../public/static', filename);
-      const imageBuffer = Buffer.from(url.split(',')[1], 'base64');
-      fs.writeFileSync(imagePath, imageBuffer);
-      const image = await imageRepository.createImage(filename, uploadby);
+      const image = uploadImage(url, uploadby);
       res.status(201).json(image);
     } else {
       res.status(400).json({ message: 'Invalid image format' });
@@ -41,5 +38,6 @@ router.post('/', authenticateToken, async function(req, res, next) {
     next(error);
   }
 });
+
 
 module.exports = router;

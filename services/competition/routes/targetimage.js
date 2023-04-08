@@ -2,7 +2,7 @@ const express = require('express');
 const { publicImageDataRequest } = require('../publisher');
 const router = express.Router();
 const TargetImage = require('../models/targetImage');
-const { compareImages, createFaceId } = require('../services/imagga');
+const { compareImages, uploadImage } = require('../services/imagga');
 
 router.post('/', async function(req, res) {
     const { imageurl, placename, radius, description } = req.body;
@@ -45,10 +45,10 @@ router.get('/', async function(req, res) {
 router.get('/compare', async (req, res) => {
     const { targetImageUrl, imageUrl } = req.query
     try {
-        //const targetImageFaceId = await createFaceId(targetImageUrl);
-        //const imageFaceId = await createFaceId(imageUrl);  
-        const score = await compareImages(targetImageUrl, imageUrl);
-        await res.json({ score });
+        const imaggaTargetImage = uploadImage(targetImageUrl);
+        const imaggaImageUrl = uploadImage(imageUrl);
+        const score = await compareImages(imaggaTargetImage, imaggaImageUrl);
+        res.json({ score });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to compare images' })

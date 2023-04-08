@@ -47,7 +47,7 @@ services:
     environment:
       - PORT=3020
       - MONGO_URL=mongodb://competitiondb:27017
-      - RABBITMQ=amqp://messagebroker
+      - RABBITMQ_URL=amqp://messagebroker
     depends_on:
       - competitiondb
     volumes:

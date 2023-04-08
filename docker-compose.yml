@@ -49,8 +49,8 @@ services:
     environment:
       - PORT=3020
       - MONGO_URL=mongodb://competitiondb:27017
-      - RABBITMQ=amqp://messagebroker
       - JWT_SECRET=cloudservices
+      - RABBITMQ_URL=amqp://messagebroker
     depends_on:
       - competitiondb
     volumes:

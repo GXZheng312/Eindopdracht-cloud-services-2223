@@ -29,7 +29,22 @@ router.get('/search', async (req, res) => {
 // GET /images/:imagename
 router.get('/:imagename', async (req, res) => {
   try {
-    const image = await imageRepository.getImageByUrl(req.params.imagename);
+    const image = await imageRepository.getImageByUrl(url, req.query.pageIndex, req.query.pageSize);
+    if (image) {
+      res.status(200).json(image);
+    } else {
+      res.status(404).json({ message: 'Image not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error getting images');
+  }
+});
+
+// GET /images/:url
+router.get('/:url', async (req, res) => {
+  try {
+    const image = await imageRepository.getImageByUrl(req.params.url);
     if (!image) {
       return res.status(404).json({ message: 'Image not found' });
     }

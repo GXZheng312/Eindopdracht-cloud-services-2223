@@ -12,7 +12,6 @@ async function createImage(imagename, uploadby) {
 async function getImageByimagename(imagename) {
   const image = await Image.findOne({ imagename });
   return image;
-
 }
 
 async function findImages(imagename, uploadby, pageIndex, pageSize) {
@@ -45,10 +44,10 @@ async function deleteImage(imagename) {
 
 module.exports = {
   createImage,
-  getImageByimagename,
   updateImage,
   deleteImage,
   getImagesByUser,
   findImages,
-  getAllImages
+  getAllImages,
+  getImageByimagename
 };

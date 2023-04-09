@@ -10,6 +10,33 @@ router.get('/', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+})
+
+router.get('/search', async (req, res) => {
+  const { radius, placename } = req.query;
+  const imageFilter = {};
+
+  if (radius) {
+    const regex = new RegExp(radius.replace(/\//g, ''), 'i');
+    imageFilter.name = regex;
+  }
+
+  if (placename) {
+    const regex = new RegExp(placename.replace(/\//g, ''), 'i');
+    imageFilter.placename = regex;
+  }
+
+  if (radius && placename) {
+    const radiusRegex = new RegExp(radius.replace(/\//g, ''), 'i');
+    const placenameRegex = new RegExp(placename.replace(/\//g, ''), 'i');
+    imageFilter.$or = [
+      { radius: { $regex: `.*${radius}.*`, $options: 'i' }, placename: placenameRegex },
+      { placename: { $regex: `.*${placename}.*`, $options: 'i' }, radius: radiusRegex },
+      { radius: radiusRegex, placename: placenameRegex }
+    ];
+  }
+  const images = await TargetImage.find(imageFilter);
+  res.json({ images });
 });
 
 // GET a single target image by id

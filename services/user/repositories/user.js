@@ -4,6 +4,7 @@ const createUser = async (username, password, roleId) => {
   const user = new User({
     username,
     password,
+    address,
     role: roleId
   });
   await user.save();

@@ -4,8 +4,35 @@ const imageRepository = require('../repositories/image');
 const { convertToBase64, uploadImage } = require('../services/image');
 const { authenticateToken } = require('../middleware/auth');
 
-// get /images/
-router.get('/', async (req, res) => {
+router.get('/search', async (req, res) => {
+  const { name, uploadby } = req.query;
+  const imageFilter = {};
+
+  if (name) {
+    const regex = new RegExp(name.replace(/\//g, ''), 'i');
+    imageFilter.imagename = regex;
+  }
+
+  if (uploadby) {
+    const regex = new RegExp(uploadby.replace(/\//g, ''), 'i');
+    imageFilter.uploadby = regex;
+  }
+
+  if (name && uploadby) {
+    const nameRegex = new RegExp(name.replace(/\//g, ''), 'i');
+    const uploadbyRegex = new RegExp(uploadby.replace(/\//g, ''), 'i');
+    imageFilter.$or = [
+      { imagename: { $regex: `.*${name}.*`, $options: 'i' }, uploadby: uploadbyRegex },
+      { uploadby: { $regex: `.*${uploadby}.*`, $options: 'i' }, imagename: nameRegex },
+      { imagename: nameRegex, uploadby: uploadbyRegex }
+    ];
+  }
+  const images = await imageRepository.findImages(imageFilter);
+  res.json({ images });
+});
+
+router.get('/:url', async function(req, res, next) {
+  const url = req.params.url;
   try {
     const images = await getAllImages();
     res.json(images);

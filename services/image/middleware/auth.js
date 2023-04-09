@@ -18,7 +18,8 @@ const authenticateToken = async (req, res, next) => {
   try {
     const decodedToken = validateToken(req.headers.authorization, res);
     req.user = decodedToken.user;
-
+    req.role = decodedToken.role;
+    
     next();
   } catch (error) {
     console.error(error);
@@ -30,6 +31,7 @@ const authenticateTokenRole = (roleName) => async (req, res, next) => {
   try {
     const decodedToken = validateToken(req.headers.authorization, res);
     req.user = decodedToken.user;
+    req.role = decodedToken.role;
 
     if (decodedToken.role !== roleName) {
       return res.status(403).json({ error: 'Unauthorized' });

@@ -34,9 +34,9 @@ const initMQ = async (callback) => {
 };
 
 const getChannel = async () => {
-  /*if (!connection || !channel) {
+  if (!connection || !channel) {
     await initMQ();
-  }*/
+  }
 
   if(!channel) {
     throw("Channel not created")
@@ -93,8 +93,6 @@ const callRPC = async (queueName, data) => {
         }
       }, { noAck: true })
     });
-
-    channel.close();
 
     return response;
   } catch (error) {

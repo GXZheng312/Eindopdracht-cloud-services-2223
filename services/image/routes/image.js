@@ -3,8 +3,6 @@ const router = express.Router();
 const imageRepository = require('../repositories/image');
 const { convertToBase64, uploadImage, deleteLocalImage } = require('../services/image');
 const { authenticateToken } = require('../middleware/auth');
-const { uploadImage } = require('../services/image');
-const { query, validationResult } = require('express-validator');
 
 router.get('/', async (req, res) => {
   try{
@@ -88,27 +86,37 @@ router.get('/user/:uploadby', async (req, res) => {
 });
 
 // PUT /images/:imagename
-router.put('/:imagename', async (req, res) => {
+router.put('/:imagename', authenticateToken, async (req, res) => {
   try {
-    const updates = req.body;
-    const image = await imageRepository.updateImage(req.params.imagename, updates);
-    if (!image) {
-      return res.status(404).json({ message: 'Image not found' });
-    }
+    const oldImageName = req.params.imagename;
+    const oldImage = await imageRepository.getImageByimagename(oldImageName);
+    const imageData = req.body.imagedata;
 
-    // Upload updated image
-    if (req.body.newImageData) {
-      const rawImageData = req.body.newImageData;
-      const imagename = await uploadImage(rawImageData, req.params.imagename);
-      console.log(`Image '${imagename}' uploaded successfully.`);
+    if(req.role != "admin" && req.user != oldImage.uploadby){
+      return res.status(403).json({ message: 'current user not authorized' });
     }
 
     // Delete old image
     if (req.body.deleteOldImage) {
-      await deleteLocalImage(req.params.imagename);
+      await deleteLocalImage(oldImageName);
+    }
+    
+    // Upload updated image
+    if (imageData) {
+      const rawImageData = imageData;
+      const binaryData = await convertToBase64(rawImageData);
+      const imagename = await uploadImage(binaryData, req.params.imagename);
+      console.log(`Image '${imagename}' uploaded successfully.`);
     }
 
-    res.json(image);
+    // update in database
+    //const image = await imageRepository.updateImage(oldImageName, updates);
+
+    // if (!image) {
+    //   return res.status(404).json({ message: 'Image not found' });
+    // }
+
+    res.json("updated");
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -116,8 +124,14 @@ router.put('/:imagename', async (req, res) => {
 });
 
 // DELETE /images/:imagename
-router.delete('/:imagename', async (req, res) => {
+router.delete('/:imagename', authenticateToken, async (req, res) => {
   try {
+    const targetImage = await imageRepository.getImageByimagename(req.params.imagename);
+
+    if(req.role != "admin" && req.user != targetImage.uploadby){
+      return res.status(403).json({ message: 'current user not authorized' });
+    }
+
     const image = await imageRepository.deleteImage(req.params.imagename);
    
     if (!image) {

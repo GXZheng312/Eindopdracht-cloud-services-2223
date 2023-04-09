@@ -9,7 +9,6 @@ router.get('/:username', async (req, res) => {
   try {
     const username = req.params.username;
     const address = req.query.address;
-    
     let projection = {};
 
     if (address === 'city') {

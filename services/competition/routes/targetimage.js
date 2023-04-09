@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const targetImageRepository = require('../repositories/targetimage');
 const { authenticateTokenRole } = require('../middleware/auth');
+const { createUniqueImageName } = require('../services/image');
+const { publishImageData } = require('../publisher');
 
 router.get('/', async (req, res) => {
   try{

@@ -36,8 +36,24 @@ const deleteLocalImage = async (imagename) => {
 }
 
 
+const getImageData = async (imagename) => {
+  const imageDirectory = path.join(__dirname, '../public/images/');
+  const imagePath = path.join(imageDirectory, imagename);
+
+  if (!fs.existsSync(imagePath)) {
+    throw new Error(`Image '${imagename}' not found`);
+  }
+
+  const imageData = await fs.promises.readFile(imagePath);
+  const base64ImageData = imageData.toString('base64');
+
+  return base64ImageData;
+}
+
+
 module.exports = {
     uploadImage,
     convertToBase64,
-    deleteLocalImage
+    deleteLocalImage,
+    getImageData
 };

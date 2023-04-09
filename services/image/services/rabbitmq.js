@@ -94,8 +94,6 @@ const callRPC = async (queueName, data) => {
       }, { noAck: true })
     });
 
-    channel.close();
-
     return response;
   } catch (error) {
     console.error(error);

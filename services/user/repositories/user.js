@@ -15,7 +15,6 @@ const getUserByUsernameAndPassword = async (username, password) => {
   const user = await User.findOne({ username, password }).populate('role'); 
   return user;
 };
-
 const updateUser = async (username, updates) => {
   const user = await User.findOneAndUpdate({ username }, updates, { new: true });
   return user;

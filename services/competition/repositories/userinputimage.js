@@ -8,7 +8,7 @@ const createUserInputImage = async (userInputImageData) => {
 
 // Get all user input images
 const getAllUserInputImages = async () => {
-    const userInputImages = await UserInputImage.find();
+    const userInputImages = await UserInputImage.find().populate("targetimage");
     return userInputImages;
 };
 

@@ -3,8 +3,9 @@ const router = express.Router();
 const userInputImageRepository = require('../repositories/userinputimage');
 const { authenticateToken } = require('../middleware/auth');
 const { createUniqueImageName } = require('../services/image');
-const { publishImageData } = require('../publisher');
+const { publishImageData, publishImageDataRequest } = require('../publisher');
 const { getTargetImageByImagename } = require('../repositories/targetimage');
+const { uploadImage } = require('../services/imagga');
 
 // GET all user input images
 router.get('/', async (req, res) => {
@@ -37,11 +38,17 @@ router.post('/', authenticateToken, async (req, res) => {
       res.status(500).json(`target image name: ${targetImagename} not valid`);
     }
 
-    const imagename = createUniqueImageName();
-    publishImageData(imagename, imageData, username);
-    userInputImageRepository.createUserInputImage({ username, score: 100, imagename, targetimage })
+    const targetImageData = await publishImageDataRequest(targetimage.imagename);
+    console.log(targetImageData)
+    const reponse = await uploadImage(targetImageData.imageData);
 
-    res.status(201).json("nog niet af");
+    //const score = 2; //functie
+
+    //const imagename = createUniqueImageName();
+    //publishImageData(imagename, imageData, username);
+    //userInputImageRepository.createUserInputImage({ username, score: 100, imagename, targetimage })
+
+    res.status(201).json("asdasd");
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

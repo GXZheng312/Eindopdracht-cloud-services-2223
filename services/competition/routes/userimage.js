@@ -39,14 +39,14 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     const targetImageData = await publishImageDataRequest(targetimage.imagename);
-    console.log(targetImageData)
-    const reponse = await uploadImage(targetImageData.imageData);
+    //console.log(targetImageData)
+    //const reponse = await uploadImage(targetImageData.imageData);
 
-    //const score = 2; //functie
+    const score = Math.floor(Math.random() * 101); //functie
 
     //const imagename = createUniqueImageName();
     //publishImageData(imagename, imageData, username);
-    //userInputImageRepository.createUserInputImage({ username, score: 100, imagename, targetimage })
+    //userInputImageRepository.createUserInputImage({ username, score: score, imagename, targetimage })
 
     res.status(201).json("asdasd");
   } catch (err) {

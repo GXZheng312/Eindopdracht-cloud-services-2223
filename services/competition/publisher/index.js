@@ -17,7 +17,26 @@ const publishImageData = async (imageName, imageData, uploadby) => {
     console.log(`sended a message for image upload. Routing key: ${routingKey}`)
 };
 
+const publishImageDeletion = async (imageName, uploadby) => {
+    const exchangeName = "image";
+    const routingKey = "image.delete." + imageName;
+
+    publishToTopic(exchangeName, routingKey, { imageName, imageData, uploadby });
+    console.log(`sended a message for image delete. Routing key: ${routingKey}`)
+};
+
+
+const publishImageUpdate = async (imageName, imageData, uploadby) => {
+    const exchangeName = "image";
+    const routingKey = "image.update." + imageName;
+
+    publishToTopic(exchangeName, routingKey, { imageName, imageData, uploadby });
+    console.log(`sended a message for image update. Routing key: ${routingKey}`)
+};
+
 module.exports = {
     publishImageDataRequest,
+    publishImageUpdate,
+    publishImageDeletion,
     publishImageData
 }

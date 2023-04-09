@@ -1,24 +1,26 @@
 const axios = require('axios');
 const fs = require('fs');
+const FormData = require('form-data');
 
-async function uploadImage(url) {
-    const form = new FormData();
+async function uploadImage(imageData) {
     const apiKey = process.env.IMAGGA_API_KEY;
     const apiSecret = process.env.IMAGGA_API_SECRET;
 
-    const { default: got } = await import('got');
-    const imageBuffer = await got(url).buffer();
-    form.append(`image`, imageBuffer, { filename: 'image.jpg' });
+    const formData  = new FormData();
+    formData.append('image_base64', imageData);
     
     const response = await fetch('https://api.imagga.com/v2/uploads', {
         method: 'POST',
-        body: form,
+        body: formData,
         headers: {
         'Authorization': `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`
         }
     });
 
+    //const response = await got.post('https://api.imagga.com/v2/uploads', {body: formData, username: apiKey, password: apiSecret});
+
     const json = await response.json();
+    console.log(json);
     return json.result.upload_ids[0];
 }
 

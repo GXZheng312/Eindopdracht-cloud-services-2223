@@ -49,10 +49,9 @@ const getChannel = async () => {
   return channel;
 };
 
-const publishToTopic = async (exchangeName, routingKey, queueName, data) => {
+const publishToTopic = async (exchangeName, routingKey, data) => {
   const channel = await getChannel();
 
-  await channel.assertQueue(queueName);
   await channel.assertExchange(exchangeName, pattern, { durable: false });
   await channel.publish(exchangeName, routingKey, Buffer.from(JSON.stringify(data)), {
     contentType: 'application/json',

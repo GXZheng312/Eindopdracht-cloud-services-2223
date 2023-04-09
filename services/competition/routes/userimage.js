@@ -18,11 +18,11 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/search', async (req, res) => {
-  try{
+  try {
     const response = await userInputImageRepository.findUserImages(req.query.username, req.query.score, req.query.pageIndex, req.query.pageSize);
     res.status(200).json(response);
   }
-  catch(error){
+  catch (error) {
     res.status(404).json('images not found ' + error)
   }
 });
@@ -56,9 +56,9 @@ router.post('/', authenticateToken, async (req, res) => {
 
     const imagename = createUniqueImageName();
     publishImageData(imagename, imageData, username);
-    userInputImageRepository.createUserInputImage({ username, score: score, imagename, targetimage })
+    const userinputimage = await userInputImageRepository.createUserInputImage({ username, score: score, imagename, targetimage })
 
-    res.status(201).json("asdasd");
+    res.status(201).json(userinputimage);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

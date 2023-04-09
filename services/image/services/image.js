@@ -41,7 +41,7 @@ const getImageData = async (imagename) => {
   const imagePath = path.join(imageDirectory, imagename);
 
   if (!fs.existsSync(imagePath)) {
-    throw new Error(`Image '${imagename}' not found`);
+    console.log(`Image '${imagename}' not found`);
   }
 
   const imageData = await fs.promises.readFile(imagePath);

@@ -3,15 +3,18 @@ const router = express.Router();
 const axios = require('axios');
 const { authenticateToken, authenticateTokenRole } = require('../middleware/auth');
 
-const root = "http://" + process.env.USER_SERVER;
+const root = "http://" + process.env.COMPETITION_SERVER;
 
 // login/
-router.post('/', async (req, res, next) => {
-  const { username, password } = req.body;
-  const url = root + "/login";
+router.post('/', authenticateToken, async (req, res, next) => {
+  const USER_SERVER = root + "/user-image/";
   
   try {
-    const response = await axios.post(url, { username, password });
+    const response = await axios.post(USER_SERVER, req.body, {
+        headers: {
+          Authorization: req.headers.authorization
+        }
+    });
     res.json(response.data);
   } catch (error) {
     console.error(error);

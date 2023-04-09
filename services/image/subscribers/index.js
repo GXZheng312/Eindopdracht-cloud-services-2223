@@ -1,8 +1,8 @@
 const amqp = require('amqplib');
-const { createImage, getImageByimagename } = require('../repositories/image');
+const { createImage, getImageByimagename, deleteImage } = require('../repositories/image');
 const { handleRPC } = require('../services/rabbitmq');
 const { subscribeToTopic } = require('../services/rabbitmq');
-const { uploadImage, getImageData, convertToBase64 } = require('../services/image');
+const { uploadImage, getImageData, convertToBase64, deleteLocalImage } = require('../services/image');
 
 const processImageDataRequest = async () => {
     const queueName = "imagedata_request";
@@ -22,7 +22,7 @@ const processImageDataRequest = async () => {
 }
 
 const processImageCreateTopic = () => {
-    const queueName = "image_queue";
+    const queueName = "image_queue_upload";
     const exchangeName = "image";
     const routingPattern = "image.upload.#"
 
@@ -37,7 +37,7 @@ const processImageCreateTopic = () => {
 }
 
 const processImageDeleteTopic = () => {
-    const queueName = "image_queue";
+    const queueName = "image_queue_delete";
     const exchangeName = "image";
     const routingPattern = "image.delete.#"
 
@@ -45,7 +45,7 @@ const processImageDeleteTopic = () => {
         console.log("recieved message in processImageDeleteTopic");
         const { imageName } = data;
 
-        const image = await imageRepository.deleteImage(imageName);
+        const image = await deleteImage(imageName);
 
         if(image) {
             await deleteLocalImage(image.imagename);
@@ -54,13 +54,19 @@ const processImageDeleteTopic = () => {
 }
 
 const processImageUpdateTopic = () => {
-    const queueName = "image_queue";
+    const queueName = "image_queue_update";
     const exchangeName = "image";
     const routingPattern = "image.create.#"
 
     subscribeToTopic(exchangeName, routingPattern, queueName, async (data, prop) => {
         console.log("recieved message in processImageUpdateTopic");
         const { imageName, imageData, uploadby } = data;
+
+        console.log(imageName);
+
+        if(!imageName || !imageData) {
+            return;
+        }
 
         // Delete old image
         if (imageName) {
@@ -71,8 +77,8 @@ const processImageUpdateTopic = () => {
         if (imageData) {
             const rawImageData = imageData;
             const binaryData = await convertToBase64(rawImageData);
-            const imagename = await uploadImage(binaryData, req.params.imagename);
-            console.log(`Image '${imagename}' uploaded successfully.`);
+            const newImageName = await uploadImage(binaryData, imageName);
+            console.log(`Image '${newImageName}' uploaded successfully.`);
         }
     })
 }

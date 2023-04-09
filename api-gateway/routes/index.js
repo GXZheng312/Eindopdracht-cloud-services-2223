@@ -8,5 +8,6 @@ router.get('/', function(req, res, next) {
 
 // add here all other routes
 router.use('/login', require('./login'));
-
+router.use('/target-image', require('./targetimage'));
+router.use('/user-image', require('./targetimage'));
 module.exports = router;

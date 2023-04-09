@@ -1,10 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
 const imageRepository = require('../repositories/image');
-const path = require('path');
 const { authenticateToken } = require('../middleware/auth');
 const { uploadImage } = require('../services/image');
+
+router.get('/search', async (req, res) => {
+  const { name, uploadby } = req.query;
+  const imageFilter = {};
+
+  if (name) {
+    const regex = new RegExp(name.replace(/\//g, ''), 'i');
+    imageFilter.imagename = regex;
+  }
+
+  if (uploadby) {
+    const regex = new RegExp(uploadby.replace(/\//g, ''), 'i');
+    imageFilter.uploadby = regex;
+  }
+
+  if (name && uploadby) {
+    const nameRegex = new RegExp(name.replace(/\//g, ''), 'i');
+    const uploadbyRegex = new RegExp(uploadby.replace(/\//g, ''), 'i');
+    imageFilter.$or = [
+      { imagename: { $regex: `.*${name}.*`, $options: 'i' }, uploadby: uploadbyRegex },
+      { uploadby: { $regex: `.*${uploadby}.*`, $options: 'i' }, imagename: nameRegex },
+      { imagename: nameRegex, uploadby: uploadbyRegex }
+    ];
+  }
+  const images = await imageRepository.findImages(imageFilter);
+  res.json({ images });
+});
 
 router.get('/:url', async function(req, res, next) {
   const url = req.params.url;
@@ -38,6 +63,5 @@ router.post('/', authenticateToken, async function(req, res, next) {
     next(error);
   }
 });
-
 
 module.exports = router;

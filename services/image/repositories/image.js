@@ -8,7 +8,12 @@ async function createImage(url, uploadby) {
   await image.save();
   return image;
 }
-
+async function findImages(data) {
+  console.log(data);
+  const images = await Image.find(data);
+  console.log("image: " + images);
+  return images;
+}
 async function getImageByUrl(url) {
   const image = await Image.findOne({ url });
   return image;
@@ -34,5 +39,6 @@ module.exports = {
   getImageByUrl,
   updateImage,
   deleteImage,
-  getImageByUser
+  getImageByUser,
+  findImages
 };

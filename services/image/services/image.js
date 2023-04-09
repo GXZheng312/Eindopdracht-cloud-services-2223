@@ -1,3 +1,7 @@
+const path = require('path');
+const fs = require('fs');
+const imageRepository = require('../repositories/image');
+
 const uploadImage = async (imageData, uploadby) =>{
     const filename = `${Date.now()}.png`;
     const imagePath = path.join(__dirname, '../public/static', filename);

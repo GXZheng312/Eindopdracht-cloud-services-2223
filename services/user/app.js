@@ -20,7 +20,6 @@ require('./seeds/');
 initMQ(() => require('./subscribers'))
 
 //routes
-app.use('/', require('./routes/index'));
 app.use('/user', require('./routes/users'));
 app.use('/login', require('./routes/login'));
 app.use('/role', require('./routes/role'));

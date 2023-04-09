@@ -17,7 +17,6 @@ app.use(express.static('public'));
 initMQ(() => require('./subscribers'))
 
 //routes
-app.use('/', require('./routes/index'));
 app.use('/images', require('./routes/image'));
 
 module.exports = app;

@@ -6,31 +6,35 @@ let connection;
 let channel;
 
 const initMQ = async (callback) => {
-  connection = await new Promise((resolve, reject) => {
-    amqp.connect(process.env.RABBITMQ_URL)
-      .then(conn => {
-        console.log("Connected to RabbitMQ");
-        resolve(conn);
-      })
-      .catch(error => {
-        console.log("Failed to connect to RabbitMQ:", error);
-        reject(error);
-      });
-  });
+  try {
+    connection = await new Promise((resolve, reject) => {
+      amqp.connect(process.env.RABBITMQ_URL)
+        .then(conn => {
+          console.log("Connected to RabbitMQ");
+          resolve(conn);
+        })
+        .catch(error => {
+          console.log("Failed to connect to RabbitMQ:", error);
+          reject(error);
+        });
+    });
 
-  channel = await new Promise((resolve, reject) => {
-    connection.createChannel()
-      .then(ch => {
-        console.log("Channel Created");
-        resolve(ch);
-      })
-      .catch(error => {
-        console.log("Failed to create channel:", error);
-        reject(error);
-      });
-  })
+    channel = await new Promise((resolve, reject) => {
+      connection.createChannel()
+        .then(ch => {
+          console.log("Channel Created");
+          resolve(ch);
+        })
+        .catch(error => {
+          console.log("Failed to create channel:", error);
+          reject(error);
+        });
+    })
 
-  callback()
+    callback()
+  } catch {
+    console.log("cant connect")
+  }
 };
 
 const getChannel = async () => {
@@ -45,10 +49,10 @@ const getChannel = async () => {
   return channel;
 };
 
-const publishToTopic = async (exchangeName, routingKey, data, QueueName = '') => {
+const publishToTopic = async (exchangeName, routingKey, queueName, data) => {
   const channel = await getChannel();
 
-  await channel.assertQueue(QueueName, { exclusive: true });
+  await channel.assertQueue(queueName);
   await channel.assertExchange(exchangeName, pattern, { durable: false });
   await channel.publish(exchangeName, routingKey, Buffer.from(JSON.stringify(data)), {
     contentType: 'application/json',
@@ -56,13 +60,13 @@ const publishToTopic = async (exchangeName, routingKey, data, QueueName = '') =>
   });
 };
 
-const subscribeToTopic = async (exchangeName, routingPattern, callback, QueueName = '') => {
+const subscribeToTopic = async (exchangeName, routingPattern, queueName, callback) => {
   const channel = await getChannel();
-  const responseQueue = await channel.assertQueue(QueueName, { exclusive: true });
 
   await channel.assertExchange(exchangeName, pattern, { durable: false });
-  await channel.bindQueue(responseQueue.queue, exchangeName, routingPattern);
-  await channel.consume(responseQueue.queue, (message) => {
+  await channel.assertQueue(queueName, { durable: true });
+  await channel.bindQueue(queueName, exchangeName, routingPattern);
+  await channel.consume(queueName, (message) => {
     callback(JSON.parse(message.content.toString()), message.properties);
     channel.ack(message);
   });

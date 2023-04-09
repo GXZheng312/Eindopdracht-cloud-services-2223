@@ -22,10 +22,11 @@ const processImageDataRequest = async () => {
 }
 
 const processImageCreateTopic = () => {
+    const queueName = "image_queue";
     const exchangeName = "image";
     const routingPattern = "image.upload.#"
 
-    subscribeToTopic(exchangeName, routingPattern, async (data, prop) => {
+    subscribeToTopic(exchangeName, routingPattern, queueName, async (data, prop) => {
         console.log("recieved message in processImageCreateTopic");
         const { imageName, imageData, uploadby } = data;
 
@@ -36,10 +37,11 @@ const processImageCreateTopic = () => {
 }
 
 const processImageDeleteTopic = () => {
+    const queueName = "image_queue";
     const exchangeName = "image";
     const routingPattern = "image.delete.#"
 
-    subscribeToTopic(exchangeName, routingPattern, async (data, prop) => {
+    subscribeToTopic(exchangeName, routingPattern, queueName, async (data, prop) => {
         console.log("recieved message in processImageDeleteTopic");
         const { imageName } = data;
 
@@ -52,10 +54,11 @@ const processImageDeleteTopic = () => {
 }
 
 const processImageUpdateTopic = () => {
+    const queueName = "image_queue";
     const exchangeName = "image";
     const routingPattern = "image.create.#"
 
-    subscribeToTopic(exchangeName, routingPattern, async (data, prop) => {
+    subscribeToTopic(exchangeName, routingPattern, queueName, async (data, prop) => {
         console.log("recieved message in processImageUpdateTopic");
         const { imageName, imageData, uploadby } = data;
 

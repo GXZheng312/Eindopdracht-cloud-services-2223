@@ -23,7 +23,7 @@ router.get('/search', async (req, res) => {
   catch(error){
     res.status(404).json('images not found ' + error)
   }
-});
+}); 
 
 // GET a single target image by id
 router.get('/:id', async (req, res) => {
@@ -54,7 +54,7 @@ router.post('/', authenticateTokenRole("admin"), async (req, res) => {
 });
 
 // UPDATE an existing target image by id
-router.put('/:id', authenticateToken("admin"), async (req, res) => {
+router.put('/:id', authenticateTokenRole("admin"), async (req, res) => {
   try {
     const { imagedata } = req.body;
     const username = req.user;
@@ -69,11 +69,11 @@ router.put('/:id', authenticateToken("admin"), async (req, res) => {
 });
 
 // DELETE a target image by id
-router.delete('/:id', authenticateToken("admin"), async (req, res) => {
+router.delete('/:id', authenticateTokenRole("admin"), async (req, res) => {
   try {
     const username = req.user;
     const targetImage = await targetImageRepository.deleteTargetImage(req.params.id);
-    
+
     publishImageDeletion(targetImage.imagename, username);
 
     res.json({ message: 'Target image deleted' });

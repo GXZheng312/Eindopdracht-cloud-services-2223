@@ -14,18 +14,15 @@ async function getImageByimagename(imagename) {
   return image;
 
 }
+
 async function findImages(imagename, uploadby, pageIndex, pageSize) {
-  const query = {};
-  if (imagename) {
-    query.imagename = imagename;
-  }
-  if (uploadby) {
-    query.uploadby = uploadby;
-  }
-  const images = await Image.find(query).byPage(parseInt(pageIndex), parseInt(pageSize));;
+  const images = await Image.find()
+    .byPage(parseInt(pageIndex), parseInt(pageSize))
+    .byImageName(imagename)
+    .byUpload(uploadby);
+
   return images;
 }
-
 async function getAllImages(pageIndex, pageSize) {
   const images = await Image.find().byPage(parseInt(pageIndex), parseInt(pageSize));
   return images;

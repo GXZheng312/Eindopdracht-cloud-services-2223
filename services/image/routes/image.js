@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const imageRepository = require('../repositories/image');
-const { convertToBase64, uploadImage } = require('../services/image');
+const { convertToBase64, uploadImage, deleteLocalImage } = require('../services/image');
 const { authenticateToken } = require('../middleware/auth');
+const { uploadImage } = require('../services/image');
+const { query, validationResult } = require('express-validator');
 
 router.get('/', async (req, res) => {
   try{
@@ -24,8 +26,8 @@ router.get('/search', async (req, res) => {
   }
 });
 
-router.get('/:url', async function(req, res, next) {
-  const url = req.params.url;
+// GET /images/:imagename
+router.get('/:imagename', async (req, res) => {
   try {
     const image = await imageRepository.getImageByUrl(url, req.query.pageIndex, req.query.pageSize);
     if (image) {
@@ -85,14 +87,27 @@ router.get('/user/:uploadby', async (req, res) => {
   }
 });
 
-// PUT /images/:url
-router.put('/:url', async (req, res) => {
+// PUT /images/:imagename
+router.put('/:imagename', async (req, res) => {
   try {
     const updates = req.body;
-    const image = await imageRepository.updateImage(req.params.url, updates);
+    const image = await imageRepository.updateImage(req.params.imagename, updates);
     if (!image) {
       return res.status(404).json({ message: 'Image not found' });
     }
+
+    // Upload updated image
+    if (req.body.newImageData) {
+      const rawImageData = req.body.newImageData;
+      const imagename = await uploadImage(rawImageData, req.params.imagename);
+      console.log(`Image '${imagename}' uploaded successfully.`);
+    }
+
+    // Delete old image
+    if (req.body.deleteOldImage) {
+      await deleteLocalImage(req.params.imagename);
+    }
+
     res.json(image);
   } catch (err) {
     console.error(err);
@@ -100,13 +115,16 @@ router.put('/:url', async (req, res) => {
   }
 });
 
-// DELETE /images/:url
-router.delete('/:url', async (req, res) => {
+// DELETE /images/:imagename
+router.delete('/:imagename', async (req, res) => {
   try {
-    const image = await imageRepository.deleteImage(req.params.url);
+    const image = await imageRepository.deleteImage(req.params.imagename);
+   
     if (!image) {
       return res.status(404).json({ message: 'Image not found' });
     }
+
+    await deleteLocalImage(image.imagename);
     res.json(image);
   } catch (err) {
     console.error(err);

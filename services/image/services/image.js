@@ -23,7 +23,21 @@ const uploadImage = async (rawImageData, imagename = null) => {
   return imagename;
 }
 
+const deleteLocalImage = async (imagename) => {
+  const imageDirectory = path.join(__dirname, '../public/images/');
+  const imagePath = path.join(imageDirectory, imagename);
+
+  try {
+    await fs.promises.unlink(imagePath);
+    console.log(`Image '${imagename}' deleted successfully.`);
+  } catch (err) {
+    console.log(`Failed to delete image '${imagename}': ${err.message}`);
+  }
+}
+
+
 module.exports = {
     uploadImage,
-    convertToBase64
+    convertToBase64,
+    deleteLocalImage
 };

@@ -8,6 +8,12 @@ async function createImage(imagename, uploadby) {
   await image.save();
   return image;
 }
+
+async function getImageByimagename(imagename) {
+  const image = await Image.findOne({ imagename });
+  return image;
+}
+
 async function findImages(imagename, uploadby, pageIndex, pageSize) {
   const images = await Image.find()
     .byPage(parseInt(pageIndex), parseInt(pageSize))
@@ -16,18 +22,12 @@ async function findImages(imagename, uploadby, pageIndex, pageSize) {
 
   return images;
 }
-
 async function getAllImages(pageIndex, pageSize) {
   const images = await Image.find().byPage(parseInt(pageIndex), parseInt(pageSize));
   return images;
 }
 
-async function getImageByUrl(url, pageIndex, pageSize) {
-  const image = await Image.findOne({ url }).byPage(parseInt(pageIndex), parseInt(pageSize));
-  return image;
-}
-
-async function getImageByUser(uploadby) {
+async function getImagesByUser(uploadby) {
   const images = await Image.find({ uploadby });
   return images;
 }
@@ -42,17 +42,12 @@ async function deleteImage(imagename) {
   return image;
 }
 
-async function getAllImages() {
-  const images = await Image.find();
-  return images;
-}
-
-
 module.exports = {
   createImage,
   updateImage,
   deleteImage,
-  getImageByUser,
+  getImagesByUser,
   findImages,
-  getAllImages
+  getAllImages,
+  getImageByimagename
 };

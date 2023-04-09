@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const targetImageRepository = require('../repositories/targetimage');
+const { authenticateTokenRole } = require('../middleware/auth');
+const { publishImageData } = require('../publisher');
+const { createUniqueImageName } = require('../services/image');
 
 // GET all target images
 router.get('/', async (req, res) => {
@@ -53,10 +56,14 @@ router.get('/:id', async (req, res) => {
 });
 
 // CREATE a new target image
-router.post('/', async (req, res) => {
-  const targetImage = req.body;
+router.post('/', authenticateTokenRole("admin"), async (req, res) => {
+  const { placename, radius, description, imageData } = req.body;
+  const imagename = createUniqueImageName();
+  const username = req.user;
   try {
-    const newTargetImage = await targetImageRepository.createTargetImage(targetImage);
+    publishImageData(imagename, imageData, username);
+
+    const newTargetImage = await targetImageRepository.createTargetImage({radius, placename, imagename, radius, description});
     res.status(201).json(newTargetImage);
   } catch (err) {
     res.status(400).json({ message: err.message });

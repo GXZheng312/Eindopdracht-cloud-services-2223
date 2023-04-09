@@ -6,11 +6,11 @@ const userInputImageSchema = new mongoose.Schema({
         required: true
     },
     score: {
-        type: String,
+        type: Number,
         required: true,
         validate: {
-            validator: (v) => {
-                return /^\d{1,2}(\.\d{1,2})?$/.test(v) && parseFloat(v) >= 0 && parseFloat(v) <= 100;
+            validator: (score) => {
+                return parseFloat(score) >= 0 && parseFloat(score) <= 100;
             },
             message: props => `${props.value} is not a valid score between 0 and 100!`
         }
@@ -27,12 +27,15 @@ const userInputImageSchema = new mongoose.Schema({
                 message: props => `${props.value} is not a valid image URL`,
             },
             {
-                validator: async (v, { targetimage }) => {
-                    const targetImage = await mongoose.model('TargetImage').findById(targetimage);
-                    return targetImage.imagename !== v;
+                validator: async (v) => {
+                  console.log('this:', this);
+                  const targetImage = await mongoose.model('TargetImage').findById(this.targetimage);
+                  console.log('targetImage:', targetImage);
+                  return targetImage.imagename !== v;
                 },
                 message: props => `'${props.value}' -> The image name cannot be the same as the target image name`,
             }
+              
         ],
     },
     targetimage: {
@@ -51,6 +54,6 @@ const userInputImageSchema = new mongoose.Schema({
             message: props => `Invalid TargetImage ID: ${props.value}`
         }
     }
-});
+}, { self: true });
 
 module.exports = mongoose.model('userInputImage', userInputImageSchema);

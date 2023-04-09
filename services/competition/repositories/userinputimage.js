@@ -3,8 +3,7 @@ const UserInputImage = require('../models/userInputImage');
 // Create a new user input image
 const createUserInputImage = async (userInputImageData) => {
     const userInputImage = new UserInputImage(userInputImageData);
-    await userInputImage.save();
-    return userInputImage;
+    return userInputImage.save();
 };
 
 // Get all user input images

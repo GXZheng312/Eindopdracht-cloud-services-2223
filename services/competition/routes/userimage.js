@@ -4,6 +4,7 @@ const userInputImageRepository = require('../repositories/userinputimage');
 const { authenticateToken } = require('../middleware/auth');
 const { createUniqueImageName } = require('../services/image');
 const { publishImageData } = require('../publisher');
+const { getTargetImageByImagename } = require('../repositories/targetimage');
 
 // GET all user input images
 router.get('/', async (req, res) => {
@@ -29,9 +30,16 @@ router.get('/:id', (req, res) => {
 router.post('/', authenticateToken, async (req, res) => {
   const { imageData, targetImagename } = req.body;
   const username = req.user;
-  const imageName = createUniqueImageName();
+
   try {
-    publishImageData(imageName, imageData, username);
+    const targetimage = await getTargetImageByImagename(targetImagename);
+    if (!targetimage) {
+      res.status(500).json(`target image name: ${targetImagename} not valid`);
+    }
+
+    const imagename = createUniqueImageName();
+    //publishImageData(imagename, imageData, username);
+    userInputImageRepository.createUserInputImage({ username, score: 100, imagename, targetimage })
 
     res.status(201).json("nog niet af");
   } catch (err) {

@@ -4,8 +4,8 @@ const getAllTargetImages = async () => {
   return TargetImage.find({});
 };
 
-const getTargetImageById = async (id) => {
-  return TargetImage.findById(id);
+const getTargetImageByImagename = async (imagename) => {
+  return TargetImage.findOne({ imagename: imagename});
 };
 
 const createTargetImage = async (targetImageData) => {
@@ -23,7 +23,7 @@ const deleteTargetImage = async (id) => {
 
 module.exports = {
   getAllTargetImages,
-  getTargetImageById,
+  getTargetImageByImagename,
   createTargetImage,
   updateTargetImage,
   deleteTargetImage,

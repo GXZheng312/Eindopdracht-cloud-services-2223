@@ -52,4 +52,26 @@ const targetImageSchema = new mongoose.Schema({
     }
 });
 
+targetImageSchema.query.byPage = function (pageIndex, pageSize) {
+    pageIndex = pageIndex || 0;
+    pageSize = pageSize || 10;
+    return this.find().skip(pageIndex * pageSize).limit(pageSize);
+};
+
+targetImageSchema.query.byPlaceName = function (placeName) {
+    if (placeName) {
+        return this.find({ placename: placeName });
+    } else {
+        return this.find();
+    }
+};
+
+targetImageSchema.query.byThumbsup = function (thumbsUp) {
+    if (thumbsUp) {
+        return this.find({ thumbsup: thumbsUp });
+    } else {
+        return this.find();
+    }
+};
+
 module.exports = mongoose.model('TargetImage', targetImageSchema);

@@ -1,25 +1,17 @@
 const express = require('express');
 const router = express.Router();
-<<<<<<< Updated upstream
 const targetImageRepository = require('../repositories/targetimage');
 const { authenticateTokenRole } = require('../middleware/auth');
-const { publishImageData } = require('../publisher');
-const { createUniqueImageName } = require('../services/image');
 
-// GET all target images
 router.get('/', async (req, res) => {
-  try {
-    const targetImages = await targetImageRepository.getAllTargetImages();
-    res.json(targetImages);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  try{
+    const response = await targetImageRepository.getAllTargetImages(req.query.pageIndex, req.query.pageSize);
+    res.status(200).json(response);
   }
-})
-=======
-const TargetImage = require('../models/targetImage');
-const { compareImages, uploadImage } = require('../services/imagga');
-const targetImageRepository = require('../repository/targetImage');
->>>>>>> Stashed changes
+  catch(error){
+    res.status(404).json('target images not found ' + error)
+ }
+});
 
 router.get('/search', async (req, res) => {
   try{

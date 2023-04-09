@@ -1,9 +1,18 @@
 const TargetImage = require('../models/targetImage');
 
-const getAllTargetImages = async () => {
-  return TargetImage.find({});
-};
+async function getAllTargetImages(pageIndex, pageSize) {
+  const targetImages = await TargetImage.find().byPage(parseInt(pageIndex), parseInt(pageSize));
+  return targetImages;
+}
 
+async function findTargetImages(placename, thumbsup, pageIndex, pageSize) {
+  const images = await TargetImage.find()
+    .byPage(parseInt(pageIndex), parseInt(pageSize))
+    .byPlaceName(placename)
+    .byThumbsUp(thumbsup);
+
+  return images;
+}
 const getTargetImageByImagename = async (imagename) => {
   return TargetImage.findOne({ imagename: imagename});
 };
@@ -27,4 +36,5 @@ module.exports = {
   createTargetImage,
   updateTargetImage,
   deleteTargetImage,
+  findTargetImages
 };

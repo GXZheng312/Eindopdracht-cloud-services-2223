@@ -3,10 +3,6 @@ const router = express.Router();
 const imageRepository = require('../repositories/image');
 const { convertToBase64, uploadImage } = require('../services/image');
 const { authenticateToken } = require('../middleware/auth');
-<<<<<<< Updated upstream
-=======
-const { uploadImage } = require('../services/image');
-const { query, validationResult } = require('express-validator');
 
 router.get('/', async (req, res) => {
   try{
@@ -17,7 +13,6 @@ router.get('/', async (req, res) => {
     res.status(404).json('images not found ' + error)
  }
 });
->>>>>>> Stashed changes
 
 router.get('/search', async (req, res) => {
   try{
@@ -32,17 +27,12 @@ router.get('/search', async (req, res) => {
 router.get('/:url', async function(req, res, next) {
   const url = req.params.url;
   try {
-<<<<<<< Updated upstream
-    const images = await getAllImages();
-    res.json(images);
-=======
     const image = await imageRepository.getImageByUrl(url, req.query.pageIndex, req.query.pageSize);
     if (image) {
       res.status(200).json(image);
     } else {
       res.status(404).json({ message: 'Image not found' });
     }
->>>>>>> Stashed changes
   } catch (error) {
     console.error(error);
     res.status(500).send('Error getting images');

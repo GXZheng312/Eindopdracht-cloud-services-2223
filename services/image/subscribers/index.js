@@ -15,11 +15,12 @@ const { uploadImage } = require('../services/image');
 
 const processImageTopic = () => {
     const exchangeName = "image";
-    const routingPattern = "image.upload.*"
- 
+    const routingPattern = "image.upload.#"
+
     subscribeToTopic(exchangeName, routingPattern, async (data, prop) => {
+        console.log("recieved message in processImageTopic");
         const { imageName, imageData, uploadby } = data;
-       
+        
         await uploadImage(imageData, imageName);
         await createImage(imageName, uploadby);
     })

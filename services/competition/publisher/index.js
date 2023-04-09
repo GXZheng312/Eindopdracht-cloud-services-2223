@@ -9,11 +9,11 @@ const publicImageDataRequest = async (url) => {
     return data;
 };
 
-const publishImageData = async (data) => {
+const publishImageData = async (imageName, imageData, uploadby) => {
     const exchangeName = "image";
-    const routingKey = "image.upload.data";
+    const routingKey = "image.upload." + imageName;
 
-    publishToTopic(exchangeName, routingKey, data);
+    publishToTopic(exchangeName, routingKey, { imageName, imageData, uploadby });
     console.log("sended a message for demo request.") 
 };
 

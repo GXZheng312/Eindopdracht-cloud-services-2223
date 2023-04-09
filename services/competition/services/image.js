@@ -7,7 +7,7 @@ const createUniqueImageName = () => {
     return Date.now().toString() + Math.floor(Math.random() * 1000).toString() + '.jpg';
 }
 
-
 module.exports = {
-    convertToBase64
+    convertToBase64,
+    createUniqueImageName
 };

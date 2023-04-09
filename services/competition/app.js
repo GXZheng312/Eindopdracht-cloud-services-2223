@@ -17,8 +17,8 @@ initMQ(() => {});//() => require('./subscribers'))
 
 //routes
 app.use('/', require('./routes/index'));
-app.use('/userimage', require('./routes/userimage'));
+app.use('/user-image', require('./routes/userimage'));
 app.use('/image', require('./routes/image'));
-app.use('/targetimage', require('./routes/targetimage'));
+app.use('/target-image', require('./routes/targetimage'));
 
 module.exports = app;

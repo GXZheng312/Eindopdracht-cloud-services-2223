@@ -38,7 +38,7 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     const imagename = createUniqueImageName();
-    //publishImageData(imagename, imageData, username);
+    publishImageData(imagename, imageData, username);
     userInputImageRepository.createUserInputImage({ username, score: 100, imagename, targetimage })
 
     res.status(201).json("nog niet af");

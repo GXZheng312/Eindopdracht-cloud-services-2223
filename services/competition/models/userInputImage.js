@@ -26,15 +26,15 @@ const userInputImageSchema = new mongoose.Schema({
                 },
                 message: props => `${props.value} is not a valid image URL`,
             },
-            {
-                validator: async (v) => {
-                  console.log('this:', this);
-                  const targetImage = await mongoose.model('TargetImage').findById(this.targetimage);
-                  console.log('targetImage:', targetImage);
-                  return targetImage.imagename !== v;
-                },
-                message: props => `'${props.value}' -> The image name cannot be the same as the target image name`,
-            }
+            // {
+            //     validator: async (v) => {
+            //       console.log('this:', this);
+            //       const targetImage = await mongoose.model('TargetImage').findById(this.targetimage);
+            //       console.log('targetImage:', targetImage);
+            //       return targetImage.imagename !== v;
+            //     },
+            //     message: props => `'${props.value}' -> The image name cannot be the same as the target image name`,
+            // }
               
         ],
     },

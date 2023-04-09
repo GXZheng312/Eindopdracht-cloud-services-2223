@@ -1,78 +1,59 @@
 const express = require('express');
-const { publicImageDataRequest } = require('../publisher');
 const router = express.Router();
-const TargetImage = require('../models/targetImage');
-const { compareImages, uploadImage } = require('../services/imagga');
+const targetImageRepository = require('../repositories/targetimage');
 
-router.post('/', async function(req, res) {
-    const { imageurl, placename, radius, description } = req.body;
-
-    const imageData = await publicImageDataRequest(imageurl);
-    if (imageData) {
-        const targetImage = new TargetImage({
-            imageurl: imageData.url,
-            thumbsup: 0,
-            placename,
-            radius, 
-            description
-          });
-        targetImage.save()
-            .then((targetImage) => {
-                res.status(200).send(`Targetimage ${targetImage.imageurl} saved successfully`);
-            })
-            .catch((err) => {
-                console.error(err);
-                res.status(500).send(`Error saving targetimage ${err}`);
-            });
-    } else {
-        res.status(404).json({ message: 'Image not found' });
-    }
+// GET all target images
+router.get('/', async (req, res) => {
+  try {
+    const targetImages = await targetImageRepository.getAllTargetImages();
+    res.json(targetImages);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
-// Retrieve all target images
-router.get('/', async function(req, res) {
-    try {
-        const targetImages = await TargetImage.find();
-        res.status(200).json(targetImages);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: `Error retrieving target images`,
-            error: err
-        });
+// GET a single target image by id
+router.get('/:id', async (req, res) => {
+  try {
+    const targetImage = await targetImageRepository.getTargetImageById(req.params.id);
+    if (targetImage == null) {
+      return res.status(404).json({ message: 'Cannot find target image' });
     }
-});
-router.get('/compare', async (req, res) => {
-    const { targetImageUrl, imageUrl } = req.query
-    try {
-        const imaggaTargetImage = uploadImage(targetImageUrl);
-        const imaggaImageUrl = uploadImage(imageUrl);
-        const score = await compareImages(imaggaTargetImage, imaggaImageUrl);
-        res.json({ score });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to compare images' })
-    }
+    res.json(targetImage);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
-// Retrieve a specific target image by URL
-router.get('/:url', async function(req, res) {
-    try {
-        const targetImage = await TargetImage.findById(req.params.url);
-        if (targetImage) {
-            res.status(200).json(targetImage);
-        } else {
-            res.status(404).json({ message: 'Target image not found' });
-        }
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: `Error retrieving target image`,
-            error: err
-        });
-    }
+// CREATE a new target image
+router.post('/', async (req, res) => {
+  const targetImage = req.body;
+  try {
+    const newTargetImage = await targetImageRepository.createTargetImage(targetImage);
+    res.status(201).json(newTargetImage);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
+// UPDATE an existing target image by id
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedTargetImage = await targetImageRepository.updateTargetImage(req.params.id, req.body);
+    res.json(updatedTargetImage);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
 
+// DELETE a target image by id
+router.delete('/:id', async (req, res) => {
+  try {
+    await targetImageRepository.deleteTargetImage(req.params.id);
+    res.json({ message: 'Target image deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
-module.exports = router; 
+module.exports = router;

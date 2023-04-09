@@ -16,6 +16,16 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/search', async (req, res) => {
+  try{
+    const response = await userInputImageRepository.findUserImages(req.query.username, req.query.score, req.query.pageIndex, req.query.pageSize);
+    res.status(200).json(response);
+  }
+  catch(error){
+    res.status(404).json('images not found ' + error)
+  }
+});
+
 // GET a single user input image by ID
 router.get('/:id', (req, res) => {
   try {

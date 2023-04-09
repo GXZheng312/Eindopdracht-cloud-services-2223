@@ -11,6 +11,13 @@ const createUser = async (username, password, roleId) => {
   return user;
 };
 
+const findUsersByAddress = async (username, address) => {
+  let query = { username };
+
+  const user = await User.find(query, { address: 1}).populate('role');
+  return user;
+}
+
 const getUserByUsernameAndPassword = async (username, password) => {
   const user = await User.findOne({ username, password }).populate('role'); 
   return user;
@@ -30,5 +37,6 @@ module.exports = {
   createUser,
   getUserByUsernameAndPassword,
   updateUser,
-  deleteUser
+  deleteUser,
+  findUsersByAddress
 };

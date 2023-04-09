@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+<<<<<<< Updated upstream
 const targetImageRepository = require('../repositories/targetimage');
 const { authenticateTokenRole } = require('../middleware/auth');
 const { publishImageData } = require('../publisher');
@@ -14,32 +15,20 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 })
+=======
+const TargetImage = require('../models/targetImage');
+const { compareImages, uploadImage } = require('../services/imagga');
+const targetImageRepository = require('../repository/targetImage');
+>>>>>>> Stashed changes
 
 router.get('/search', async (req, res) => {
-  const { radius, placename } = req.query;
-  const imageFilter = {};
-
-  if (radius) {
-    const regex = new RegExp(radius.replace(/\//g, ''), 'i');
-    imageFilter.name = regex;
+  try{
+    const response = await targetImageRepository.findTargetImages(req.query.placename, req.query.thumbsup, req.query.pageIndex, req.query.pageSize);
+    res.status(200).json(response);
   }
-
-  if (placename) {
-    const regex = new RegExp(placename.replace(/\//g, ''), 'i');
-    imageFilter.placename = regex;
+  catch(error){
+    res.status(404).json('images not found ' + error)
   }
-
-  if (radius && placename) {
-    const radiusRegex = new RegExp(radius.replace(/\//g, ''), 'i');
-    const placenameRegex = new RegExp(placename.replace(/\//g, ''), 'i');
-    imageFilter.$or = [
-      { radius: { $regex: `.*${radius}.*`, $options: 'i' }, placename: placenameRegex },
-      { placename: { $regex: `.*${placename}.*`, $options: 'i' }, radius: radiusRegex },
-      { radius: radiusRegex, placename: placenameRegex }
-    ];
-  }
-  const images = await TargetImage.find(imageFilter);
-  res.json({ images });
 });
 
 // GET a single target image by id

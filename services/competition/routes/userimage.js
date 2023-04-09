@@ -3,7 +3,7 @@ const router = express.Router();
 const userInputImageRepository = require('../repositories/userinputimage');
 const { authenticateToken } = require('../middleware/auth');
 const { createUniqueImageName } = require('../services/image');
-const { publishImageData, publishImageDataRequest } = require('../publisher');
+const { publishImageData, publishImageDataRequest, publishImageDeletion } = require('../publisher');
 const { getTargetImageByImagename } = require('../repositories/targetimage');
 const { uploadImage } = require('../services/imagga');
 
@@ -52,11 +52,11 @@ router.post('/', authenticateToken, async (req, res) => {
     //console.log(targetImageData)
     //const reponse = await uploadImage(targetImageData.imageData);
 
-    const score = Math.floor(Math.random() * 101); //functie
+    const score = Math.floor(Math.random() * 101);
 
-    //const imagename = createUniqueImageName();
-    //publishImageData(imagename, imageData, username);
-    //userInputImageRepository.createUserInputImage({ username, score: score, imagename, targetimage })
+    const imagename = createUniqueImageName();
+    publishImageData(imagename, imageData, username);
+    userInputImageRepository.createUserInputImage({ username, score: score, imagename, targetimage })
 
     res.status(201).json("asdasd");
   } catch (err) {
@@ -65,9 +65,12 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 // DELETE a user input image by ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   try {
-    await userInputImageRepository.deleteUserInputImageById(req.params.id);
+    const username = req.user;
+    const deletedUserimage = await userInputImageRepository.deleteUserInputImageById(req.params.id);
+    publishImageDeletion(deletedUserimage.imagename, username);
+
     res.status(200).json({ message: 'User input image deleted successfully.' });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const targetImageRepository = require('../repositories/targetimage');
-const { authenticateTokenRole } = require('../middleware/auth');
+const { authenticateTokenRole, authenticateToken } = require('../middleware/auth');
 const { createUniqueImageName } = require('../services/image');
-const { publishImageData } = require('../publisher');
+const { publishImageData, publishImageDeletion, publishImageUpdate } = require('../publisher');
 
 router.get('/', async (req, res) => {
   try{
@@ -54,9 +54,14 @@ router.post('/', authenticateTokenRole("admin"), async (req, res) => {
 });
 
 // UPDATE an existing target image by id
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticateToken("admin"), async (req, res) => {
   try {
+    const { imagedata } = req.body;
+    const username = req.user;
     const updatedTargetImage = await targetImageRepository.updateTargetImage(req.params.id, req.body);
+
+    publishImageUpdate(updatedTargetImage.imagename, imagedata, username)
+
     res.json(updatedTargetImage);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -64,9 +69,13 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE a target image by id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateToken("admin"), async (req, res) => {
   try {
-    await targetImageRepository.deleteTargetImage(req.params.id);
+    const username = req.user;
+    const targetImage = await targetImageRepository.deleteTargetImage(req.params.id);
+    
+    publishImageDeletion(targetImage.imagename, username);
+
     res.json({ message: 'Target image deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

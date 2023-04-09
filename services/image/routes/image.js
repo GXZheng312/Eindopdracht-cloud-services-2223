@@ -3,41 +3,26 @@ const router = express.Router();
 const imageRepository = require('../repositories/image');
 const { convertToBase64, uploadImage, deleteLocalImage } = require('../services/image');
 const { authenticateToken } = require('../middleware/auth');
+const { uploadImage } = require('../services/image');
+const { query, validationResult } = require('express-validator');
 
-router.get('/search', async (req, res) => {
-  const { name, uploadby } = req.query;
-  const imageFilter = {};
-
-  if (name) {
-    const regex = new RegExp(name.replace(/\//g, ''), 'i');
-    imageFilter.imagename = regex;
+router.get('/', async (req, res) => {
+  try{
+    const response = await imageRepository.getAllImages(req.query.pageIndex, req.query.pageSize);
+    res.status(200).json(response);
   }
-
-  if (uploadby) {
-    const regex = new RegExp(uploadby.replace(/\//g, ''), 'i');
-    imageFilter.uploadby = regex;
-  }
-
-  if (name && uploadby) {
-    const nameRegex = new RegExp(name.replace(/\//g, ''), 'i');
-    const uploadbyRegex = new RegExp(uploadby.replace(/\//g, ''), 'i');
-    imageFilter.$or = [
-      { imagename: { $regex: `.*${name}.*`, $options: 'i' }, uploadby: uploadbyRegex },
-      { uploadby: { $regex: `.*${uploadby}.*`, $options: 'i' }, imagename: nameRegex },
-      { imagename: nameRegex, uploadby: uploadbyRegex }
-    ];
-  }
-  const images = await imageRepository.findImages(imageFilter);
-  res.json({ images });
+  catch(error){
+    res.status(404).json('images not found ' + error)
+ }
 });
 
-router.get('/', async (req, res, next) => {
-  try {
-    const images = await imageRepository.getAllImages();
-    res.json(images);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error getting images');
+router.get('/search', async (req, res) => {
+  try{
+    const response = await imageRepository.findImages(req.query.imagename, req.query.uploadby, req.query.pageIndex, req.query.pageSize);
+    res.status(200).json(response);
+  }
+  catch(error){
+    res.status(404).json('images not found ' + error)
   }
 });
 

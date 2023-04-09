@@ -16,9 +16,7 @@ app.use(express.json());
 initMQ(() => {});//() => require('./subscribers'))
 
 //routes
-app.use('/', require('./routes/index'));
-app.use('/user', require('./routes/users'));
-app.use('/image', require('./routes/image'));
-app.use('/targetimage', require('./routes/targetimage'));
+app.use('/user-image', require('./routes/userimage'));
+app.use('/target-image', require('./routes/targetimage'));
 
 module.exports = app;

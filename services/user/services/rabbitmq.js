@@ -49,10 +49,9 @@ const getChannel = async () => {
   return channel;
 };
 
-const publishToTopic = async (exchangeName, routingKey, data, QueueName = '') => {
+const publishToTopic = async (exchangeName, routingKey, data) => {
   const channel = await getChannel();
 
-  await channel.assertQueue(QueueName, { exclusive: true });
   await channel.assertExchange(exchangeName, pattern, { durable: false });
   await channel.publish(exchangeName, routingKey, Buffer.from(JSON.stringify(data)), {
     contentType: 'application/json',
@@ -60,13 +59,13 @@ const publishToTopic = async (exchangeName, routingKey, data, QueueName = '') =>
   });
 };
 
-const subscribeToTopic = async (exchangeName, routingPattern, callback, QueueName = '') => {
+const subscribeToTopic = async (exchangeName, routingPattern, queueName, callback) => {
   const channel = await getChannel();
-  const responseQueue = await channel.assertQueue(QueueName, { exclusive: true });
 
   await channel.assertExchange(exchangeName, pattern, { durable: false });
-  await channel.bindQueue(responseQueue.queue, exchangeName, routingPattern);
-  await channel.consume(responseQueue.queue, (message) => {
+  await channel.assertQueue(queueName, { durable: true });
+  await channel.bindQueue(queueName, exchangeName, routingPattern);
+  await channel.consume(queueName, (message) => {
     callback(JSON.parse(message.content.toString()), message.properties);
     channel.ack(message);
   });
@@ -97,8 +96,6 @@ const callRPC = async (queueName, data) => {
         }
       }, { noAck: true })
     });
-
-    channel.close();
 
     return response;
   } catch (error) {

@@ -1,78 +1,85 @@
 const express = require('express');
-const { publicImageDataRequest } = require('../publisher');
 const router = express.Router();
-const TargetImage = require('../models/targetImage');
-const { compareImages, uploadImage } = require('../services/imagga');
+const targetImageRepository = require('../repositories/targetimage');
+const { authenticateTokenRole, authenticateToken } = require('../middleware/auth');
+const { createUniqueImageName } = require('../services/image');
+const { publishImageData, publishImageDeletion, publishImageUpdate } = require('../publisher');
 
-router.post('/', async function(req, res) {
-    const { imageurl, placename, radius, description } = req.body;
-
-    const imageData = await publicImageDataRequest(imageurl);
-    if (imageData) {
-        const targetImage = new TargetImage({
-            imageurl: imageData.url,
-            thumbsup: 0,
-            placename,
-            radius, 
-            description
-          });
-        targetImage.save()
-            .then((targetImage) => {
-                res.status(200).send(`Targetimage ${targetImage.imageurl} saved successfully`);
-            })
-            .catch((err) => {
-                console.error(err);
-                res.status(500).send(`Error saving targetimage ${err}`);
-            });
-    } else {
-        res.status(404).json({ message: 'Image not found' });
-    }
+router.get('/', async (req, res) => {
+  try{
+    const response = await targetImageRepository.getAllTargetImages(req.query.pageIndex, req.query.pageSize);
+    res.status(200).json(response);
+  }
+  catch(error){
+    res.status(404).json('target images not found ' + error)
+ }
 });
 
-// Retrieve all target images
-router.get('/', async function(req, res) {
-    try {
-        const targetImages = await TargetImage.find();
-        res.status(200).json(targetImages);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: `Error retrieving target images`,
-            error: err
-        });
+router.get('/search', async (req, res) => {
+  try{
+    const response = await targetImageRepository.findTargetImages(req.query.placename, req.query.thumbsup, req.query.pageIndex, req.query.pageSize);
+    res.status(200).json(response);
+  }
+  catch(error){
+    res.status(404).json('images not found ' + error)
+  }
+}); 
+
+// GET a single target image by id
+router.get('/:id', async (req, res) => {
+  try {
+    const targetImage = await targetImageRepository.getTargetImageById(req.params.id);
+    if (targetImage == null) {
+      return res.status(404).json({ message: 'Cannot find target image' });
     }
-});
-router.get('/compare', async (req, res) => {
-    const { targetImageUrl, imageUrl } = req.query
-    try {
-        const imaggaTargetImage = uploadImage(targetImageUrl);
-        const imaggaImageUrl = uploadImage(imageUrl);
-        const score = await compareImages(imaggaTargetImage, imaggaImageUrl);
-        res.json({ score });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to compare images' })
-    }
+    res.json(targetImage);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
-// Retrieve a specific target image by URL
-router.get('/:url', async function(req, res) {
-    try {
-        const targetImage = await TargetImage.findById(req.params.url);
-        if (targetImage) {
-            res.status(200).json(targetImage);
-        } else {
-            res.status(404).json({ message: 'Target image not found' });
-        }
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: `Error retrieving target image`,
-            error: err
-        });
-    }
+// CREATE a new target image
+router.post('/', authenticateTokenRole("admin"), async (req, res) => {
+  const { placename, radius, description, imageData } = req.body;
+  const imagename = createUniqueImageName();
+  const username = req.user;
+  try {
+    publishImageData(imagename, imageData, username);
+
+    const newTargetImage = await targetImageRepository.createTargetImage({radius, placename, imagename, radius, description});
+    res.status(201).json(newTargetImage);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
+// UPDATE an existing target image by id
+router.put('/:id', authenticateTokenRole("admin"), async (req, res) => {
+  try {
+    const { imagedata } = req.body;
+    const username = req.user;
+    const updatedTargetImage = await targetImageRepository.updateTargetImage(req.params.id, req.body);
 
+    publishImageUpdate(updatedTargetImage.imagename, imagedata, username)
 
-module.exports = router; 
+    res.json(updatedTargetImage);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// DELETE a target image by id
+router.delete('/:id', authenticateTokenRole("admin"), async (req, res) => {
+  try {
+    const username = req.user;
+    const targetImage = await targetImageRepository.deleteTargetImage(req.params.id);
+
+    publishImageDeletion(targetImage.imagename, username);
+
+    res.json({ message: 'Target image deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+module.exports = router;
